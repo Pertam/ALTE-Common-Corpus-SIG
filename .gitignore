@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+
+# Secrets
+.env
+*.key
+secrets/
+openai_api_key.txt
+
+# Large data / private data
+data/
+raw/
+interim/
+outputs/full_outputs/
+*.parquet
+*.zip
+*.gz
+*.tar
+*.tar.gz
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Excel temp files
+~$*.xlsx
