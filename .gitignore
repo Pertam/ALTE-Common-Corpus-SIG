@@ -12,11 +12,11 @@ env/
 secrets/
 openai_api_key.txt
 
-# Large data / private data
+# Large/private data
 data/
 raw/
 interim/
-outputs/full_outputs/
+outputs/
 *.parquet
 *.zip
 *.gz
@@ -31,5 +31,5 @@ logs/
 .DS_Store
 Thumbs.db
 
-# Excel temp files
+# Excel temporary files
 ~$*.xlsx

@@ -1,0 +1,19 @@
+project_name: ALTE Common Corpus SIG
+drive_root: /content/drive/MyDrive/ALTE-Common-Corpus-SIG
+
+sampling:
+  content_pos:
+    - NOUN
+    - VERB
+    - ADJ
+    - ADV
+  min_arf_per_million: 50
+  sample_lemmas_per_language: 15
+  random_seed: 42
+
+llm:
+  pass1_model: gpt-5.4-mini
+  pass2_model: gpt-5.4-mini
+  pass3_model: gpt-5.5
+  provenance_tier: 4
+  review_status_default: provisional

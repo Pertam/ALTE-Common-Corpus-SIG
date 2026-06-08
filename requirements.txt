@@ -1,0 +1,10 @@
+pandas
+numpy
+pyarrow
+openpyxl
+tqdm
+python-dotenv
+pyyaml
+openai
+spacy
+stanza
