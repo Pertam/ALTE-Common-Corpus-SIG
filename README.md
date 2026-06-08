@@ -1,5 +1,3 @@
-# ALTE-Common-Corpus-SIG
-
 # ALTE Common Corpus SIG
 
 This repository contains the reproducible code, prompts, configuration files, and methodological documentation for the ALTE Common Corpus SIG pilot work linked to the European CEFR Vocabulary Atlas.
