@@ -1,0 +1,10 @@
+pandas>=2.0
+pyarrow>=14.0
+numpy>=1.24
+tqdm>=4.66
+spacy>=3.7
+openai>=1.0
+python-dotenv>=1.0
+tenacity>=8.2
+nbformat>=5.9
+openpyxl>=3.1
