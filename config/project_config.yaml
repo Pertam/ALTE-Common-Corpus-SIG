@@ -1,0 +1,27 @@
+project_name: european_cefr_vocabulary_atlas_pilot
+random_seed: 20260603
+languages:
+  en:
+    language: English
+    spacy_model: en_core_web_sm
+  fr:
+    language: French
+    spacy_model: fr_core_news_sm
+  es:
+    language: Spanish
+    spacy_model: es_core_news_sm
+  de:
+    language: German
+    spacy_model: de_core_news_sm
+  cs:
+    language: Czech
+    spacy_model: cs_core_news_sm
+content_pos: [NOUN, VERB, ADJ, ADV]
+min_arf_per_million: 50
+lemmas_per_language: 15
+sentences_per_lemma: 50
+llm:
+  pass1_model: gpt-5.4-mini
+  pass2_model: gpt-5.4-mini
+  pass3_model: gpt-5.5
+  batch_size: 25

@@ -1,0 +1,6 @@
+column_name,purpose,example_value
+expert_decision,Reviewer decision on row,"accept/change/uncertain/reject"
+expert_function_id,Corrected function ID if changed,"DIR_03"
+expert_function_label,Corrected function label if changed,"requesting action"
+expert_comment,Short explanation of reviewer decision,"Sentence is an instruction rather than a request."
+adjudication_required,Whether another expert or final project decision is needed,"true/false"

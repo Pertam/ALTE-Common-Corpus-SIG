@@ -1,0 +1,24 @@
+Expected raw Leipzig sentence format
+===================================
+
+One sentence per line.
+Typical format:
+
+<sentence_id>\t<sentence_text>
+
+Example:
+
+1	This is the first sentence.
+2	This is the second sentence.
+
+Recommended Drive location:
+
+data/raw/{language_code}/{language_code}_sentences.txt
+
+Examples:
+
+data/raw/en/en_sentences.txt
+data/raw/fr/fr_sentences.txt
+data/raw/es/es_sentences.txt
+data/raw/de/de_sentences.txt
+data/raw/cs/cs_sentences.txt
