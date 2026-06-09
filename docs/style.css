@@ -180,3 +180,21 @@ footer div {
 li {
   margin-bottom: 0.35rem;
 }
+.card {
+  display: flex;
+  flex-direction: column;
+}
+
+.card p {
+  flex-grow: 1;
+}
+
+.card .button {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+.button,
+.button.secondary {
+  background: #2563eb;
+}
