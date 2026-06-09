@@ -249,3 +249,40 @@ table code {
   padding: 0.9rem 1.2rem;
   margin: 0 0 1.5rem;
 }
+
+/* AUTO-GENERATED-READABILITY:v1 */
+details {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin: 0.75rem 0;
+}
+details summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--blue);
+}
+pre.prompt-text {
+  white-space: pre-wrap;
+  background: #f3f4f6;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  overflow-x: auto;
+}
+p.prompt-note {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 0;
+}
+/* keep wide tables usable on narrow screens */
+main table {
+  display: block;
+  overflow-x: auto;
+}
+/* comfortable reading measure for long paragraphs */
+main section > p {
+  max-width: 75ch;
+}
