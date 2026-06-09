@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Stage 3: Sampling | ALTE Common Corpus SIG</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+  <div class="header-inner">
+    <h1>Stage 3: Sampling</h1>
+    <p>Select candidate lemmas and sentence examples for controlled, reviewable LLM-assisted function tagging.</p>
+  </div>
+</header>
+
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html">Home</a>
+    <a href="workflow.html">Workflow</a>
+    <a href="technical-setup.html">Technical setup</a>
+    <a href="reviewer-area.html">Reviewer area</a>
+    <a href="methodology.html">Methodology</a>
+    <a href="links.html">Links</a>
+    <a href="faq.html">FAQ</a>
+  </div>
+</nav>
+
+
+<main>
+
+<section class="warning">
+  <strong>Purpose:</strong> Stage 3 creates manageable samples for LLM-assisted sentence-level function tagging.
+</section>
+
+<section>
+  <h2>What happens in this stage?</h2>
+  <p>
+    Lemmas are filtered and sampled so that the project can test the workflow without tagging an unmanageable number of sentences.
+    The current pilot design samples candidate lemmas that pass a minimum ARF threshold and then extracts sentence examples for those lemmas.
+  </p>
+</section>
+
+<section>
+  <h2>Current sampling settings</h2>
+  <table>
+    <tr><th>Setting</th><th>Current pilot value</th><th>Reason</th></tr>
+    <tr>
+      <td>Languages</td>
+      <td><code>en, fr, es, de, cs</code></td>
+      <td>Five-language feasibility pilot.</td>
+    </tr>
+    <tr>
+      <td>Content POS</td>
+      <td><code>NOUN, VERB, ADJ, ADV</code></td>
+      <td>Focuses on lexical content items.</td>
+    </tr>
+    <tr>
+      <td>Minimum ARF per million</td>
+      <td><code>≥ 50</code></td>
+      <td>Reduces unstable or very low-dispersion items.</td>
+    </tr>
+    <tr>
+      <td>Initial sample</td>
+      <td><code>15 lemmas per language</code></td>
+      <td>Small enough for testing but large enough to expose workflow issues.</td>
+    </tr>
+    <tr>
+      <td>Sentence extraction</td>
+      <td><code>all sentences for selected lemmas</code></td>
+      <td>Allows functional distribution to be inspected by lemma.</td>
+    </tr>
+  </table>
+</section>
+
+<section>
+  <h2>Example sampling row</h2>
+  <table>
+    <tr><th>Column</th><th>Example value</th></tr>
+    <tr><td><code>language</code></td><td><code>en</code></td></tr>
+    <tr><td><code>lemma</code></td><td><code>send</code></td></tr>
+    <tr><td><code>pos</code></td><td><code>VERB</code></td></tr>
+    <tr><td><code>arf_per_million</code></td><td><code>58.7</code></td></tr>
+    <tr><td><code>sample_status</code></td><td><code>selected</code></td></tr>
+    <tr><td><code>sentence_count</code></td><td><code>50</code></td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>Example sampled sentence row</h2>
+  <table>
+    <tr><th>Column</th><th>Example value</th></tr>
+    <tr><td><code>row_id</code></td><td><code>en_send_0001</code></td></tr>
+    <tr><td><code>language</code></td><td><code>en</code></td></tr>
+    <tr><td><code>lemma</code></td><td><code>send</code></td></tr>
+    <tr><td><code>sentence</code></td><td><em>Could you send me the report by Friday?</em></td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>Output folders</h2>
+  <table>
+    <tr><th>Output</th><th>Folder</th></tr>
+    <tr><td>Filtered lemma lists</td><td><code>Drive/data/interim/{lang}/filtered_lemmas/</code></td></tr>
+    <tr><td>Sampled lemma files</td><td><code>Drive/data/interim/{lang}/samples/</code></td></tr>
+    <tr><td>Sentence samples for tagging</td><td><code>Drive/data/interim/{lang}/samples/</code></td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>Checks and risks</h2>
+  <ul>
+    <li>Sampling should not be mistaken for final vocabulary selection.</li>
+    <li>ARF helps with dispersion, but does not determine CEFR level.</li>
+    <li>Random sampling should be recorded so that the run is reproducible.</li>
+    <li>All sentence rows need stable <code>row_id</code> values before LLM tagging.</li>
+  </ul>
+</section>
+
+<section>
+  <p><a class="button" href="workflow.html">← Back to workflow overview</a></p>
+</section>
+
+</main>
+
+
+<footer>
+  <div>
+    <strong>ALTE Common Corpus SIG</strong><br>
+    European CEFR Vocabulary Atlas pilot support workflow.
+  </div>
+</footer>
+
+
+</body>
+</html>

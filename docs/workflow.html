@@ -6,12 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <header>
   <div class="header-inner">
     <h1>Five-Stage Workflow</h1>
-    <p>The operational pipeline for the current pilot.</p>
+    <p>A staged overview of how raw corpus data becomes provisional, reviewable sentence-level CEFR function-tagging output.</p>
   </div>
 </header>
 
@@ -27,76 +28,280 @@
     <a href="faq.html">FAQ</a>
   </div>
 </nav>
+
+
+<main>
+
+<section class="warning">
+  <strong>Pilot material — not validated CEFR data.</strong><br>
+  This workflow describes a methodological pilot. LLM-generated outputs are provisional Tier 4 candidate material for expert review, not validated CEFR vocabulary data.
+</section>
+
+<section>
+  <h2>Five-stage workflow overview</h2>
+
+  <p>
+    The project is organised as a staged workflow. The cards below give a short overview.
+    Select a stage to see the detailed inputs, process, outputs, scripts, folder locations, and review considerations.
+  </p>
+
+  <div class="card-grid">
+
+    <a class="card card-link" href="stage1-corpus-preparation.html">
+      <h3>Stage 1: Corpus preparation</h3>
+      <p>Collect raw corpus files, metadata, licensing notes, and source documentation.</p>
+      <span class="read-more">Read more →</span>
+    </a>
+
+    <a class="card card-link" href="stage2-processing.html">
+      <h3>Stage 2: Processing and lemma statistics</h3>
+      <p>Tokenise, sentence-split, POS-tag, lemmatise, and calculate frequency, dispersion and ARF.</p>
+      <span class="read-more">Read more →</span>
+    </a>
+
+    <a class="card card-link" href="stage3-sampling.html">
+      <h3>Stage 3: Sampling</h3>
+      <p>Select candidate lemmas and sentence examples using content-word and ARF-based criteria.</p>
+      <span class="read-more">Read more →</span>
+    </a>
+
+    <a class="card card-link" href="stage4-function-tagging.html">
+      <h3>Stage 4: Function tagging</h3>
+      <p>Run Pass 1, Pass 2 and Pass 3 using the controlled CEFR-derived function taxonomy.</p>
+      <span class="read-more">Read more →</span>
+    </a>
+
+    <a class="card card-link" href="stage5-qa-review.html">
+      <h3>Stage 5: QA and expert review</h3>
+      <p>Validate outputs, create review workbooks, record expert comments, and prepare final candidate datasets.</p>
+      <span class="read-more">Read more →</span>
+    </a>
+
+  </div>
+</section>
+
 <section>
   <h2>Worked example: one sentence through the workflow</h2>
 
   <p>
-    The example below shows how one sentence moves through the pilot workflow.
-    The labels shown here are illustrative only and are not validated CEFR data.
+    The example below shows how one sampled sentence becomes a provisional sentence-level function tag.
+    The values are illustrative only and are not validated CEFR data.
   </p>
 
   <table>
     <tr>
       <th>Stage</th>
-      <th>What happens</th>
+      <th>Input</th>
+      <th>Processing step</th>
       <th>Example output</th>
     </tr>
 
     <tr>
-      <td>Stage 1: Corpus preparation</td>
-      <td>The sentence is identified in the source corpus and assigned a sentence ID.</td>
-      <td><em>Could you send me the report by Friday?</em></td>
+      <td><strong>Stage 1: Corpus preparation</strong></td>
+      <td>
+        Raw corpus text:<br>
+        <em>Could you send me the report by Friday?</em>
+      </td>
+      <td>
+        The sentence is extracted from the corpus and assigned a stable sentence identifier.
+      </td>
+      <td>
+        <code>sentence_id = en_00018452</code><br>
+        <code>language = en</code><br>
+        <code>source_register = web_or_news</code>
+      </td>
     </tr>
 
     <tr>
-      <td>Stage 2: Processing and lemma statistics</td>
-      <td>The sentence is tokenised, lemmatised and linked to corpus statistics.</td>
-      <td>Target lemma: <strong>send</strong></td>
+      <td><strong>Stage 2: Processing and lemma statistics</strong></td>
+      <td>
+        Sentence ID:<br>
+        <code>en_00018452</code>
+      </td>
+      <td>
+        The sentence is tokenised, POS-tagged and lemmatised. The target lemma is linked to corpus statistics.
+      </td>
+      <td>
+        <code>token = send</code><br>
+        <code>lemma = send</code><br>
+        <code>pos = VERB</code><br>
+        <code>raw_frequency = 1,284</code><br>
+        <code>fpm = 64.2</code><br>
+        <code>arf_per_million = 58.7</code>
+      </td>
     </tr>
 
     <tr>
-      <td>Stage 3: Sampling</td>
-      <td>The lemma passes the ARF threshold and the sentence is selected for tagging.</td>
-      <td>Sample sentence retained for LLM tagging.</td>
+      <td><strong>Stage 3: Sampling</strong></td>
+      <td>
+        Candidate lemma:<br>
+        <code>send</code>
+      </td>
+      <td>
+        The lemma passes the pilot threshold and one or more sentences are selected for function tagging.
+      </td>
+      <td>
+        <code>sample_status = selected</code><br>
+        <code>sampling_rule = content POS + ARF ≥ 50</code><br>
+        <code>sampled_sentence_count = 50</code>
+      </td>
     </tr>
 
     <tr>
-      <td>Stage 4: LLM function tagging</td>
-      <td>The whole sentence is tagged for communicative function using the controlled taxonomy.</td>
-      <td>Illustrative function: <strong>requesting someone to do something</strong></td>
+      <td><strong>Stage 4a: Pass 1 function tagging</strong></td>
+      <td>
+        <em>Could you send me the report by Friday?</em>
+      </td>
+      <td>
+        The LLM assigns a first-pass sentence-level communicative function using the controlled taxonomy.
+      </td>
+      <td>
+        <code>pass1_function_id = DIR_03</code><br>
+        <code>pass1_function_label = requesting action</code><br>
+        <code>pass1_confidence = high</code><br>
+        <code>requires_review = false</code>
+      </td>
     </tr>
 
     <tr>
-      <td>Stage 5: QA and expert review</td>
-      <td>The output is checked, exported, and reviewed by experts.</td>
-      <td>Status: <strong>provisional Tier 4 candidate material</strong></td>
+      <td><strong>Stage 4b: Pass 2 blind validation</strong></td>
+      <td>
+        Pass 1 output:<br>
+        <code>DIR_03</code>
+      </td>
+      <td>
+        A second LLM pass challenges the Pass 1 decision and either accepts it, changes it, or marks it uncertain.
+      </td>
+      <td>
+        <code>validator_decision = accept</code><br>
+        <code>pass2_function_id = DIR_03</code><br>
+        <code>pass2_confidence = high</code><br>
+        <code>requires_review = false</code>
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>Stage 4c: Pass 3 adjudication</strong></td>
+      <td>
+        Pass 1 and Pass 2 agree:<br>
+        <code>DIR_03</code>
+      </td>
+      <td>
+        Pass 3 is used where needed to adjudicate disagreement, low confidence or ambiguity.
+      </td>
+      <td>
+        <code>pass3_required = false</code><br>
+        <code>final_function_id = DIR_03</code><br>
+        <code>final_source = pass2</code>
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>Stage 5: QA and expert review</strong></td>
+      <td>
+        Final candidate tag:<br>
+        <code>DIR_03</code>
+      </td>
+      <td>
+        The row is checked for valid taxonomy labels, confidence, review status and provenance.
+      </td>
+      <td>
+        <code>cefr_source = llm_judgment</code><br>
+        <code>provenance_tier = 4</code><br>
+        <code>review_status = provisional</code><br>
+        <code>expert_review_status = pending</code>
+      </td>
     </tr>
   </table>
 </section>
 
-<main>
+<section>
+  <h2>How the prompt passes work</h2>
 
-<section class="card-grid">
-  <div class="card">
-    <h3>Stage 1: Corpus preparation</h3>
-    <p>Collect raw corpus files, metadata, licensing notes, and source documentation. Clean and normalise corpus text.</p>
-  </div>
-  <div class="card">
-    <h3>Stage 2: Processing and lemma statistics</h3>
-    <p>Tokenise, sentence-split, POS-tag, lemmatise, filter content words, and calculate raw frequency, frequency per million, dispersion, ARF and ARF per million.</p>
-  </div>
-  <div class="card">
-    <h3>Stage 3: Sampling</h3>
-    <p>Filter to content words and ARF per million ≥ 50. Randomly sample candidate lemmas and extract sentence examples.</p>
-  </div>
-  <div class="card">
-    <h3>Stage 4: LLM function tagging</h3>
-    <p>Run Pass 1 tagging, Pass 2 blind validation, and Pass 3 lemma-level aggregation using the controlled taxonomy.</p>
-  </div>
-  <div class="card">
-    <h3>Stage 5: QA and expert review</h3>
-    <p>Run validation checks, export review workbooks, collect expert review, and record adjudication decisions.</p>
-  </div>
+  <p>
+    The function-tagging workflow uses three LLM prompt passes. Each pass sends one sentence, or one row of previous output, to the OpenAI API with a controlled JSON schema. The model must choose only from the controlled taxonomy.
+  </p>
+
+  <table>
+    <tr>
+      <th>Pass</th>
+      <th>Purpose</th>
+      <th>What the prompt sees</th>
+      <th>What the prompt must return</th>
+      <th>Why this matters</th>
+    </tr>
+
+    <tr>
+      <td><strong>Pass 1: First-pass function tagging</strong></td>
+      <td>Assign an initial sentence-level communicative function.</td>
+      <td>
+        <code>row_id</code><br>
+        <code>sentence</code><br>
+        controlled taxonomy with function IDs, labels and guidance
+      </td>
+      <td>
+        <code>function_id</code><br>
+        <code>function_label</code><br>
+        <code>confidence</code><br>
+        <code>rationale</code><br>
+        <code>alternative_function_id</code><br>
+        <code>requires_review</code>
+      </td>
+      <td>
+        Creates the first candidate label while forcing the model to tag the whole sentence, not just the sampled lemma.
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>Pass 2: Blind validation</strong></td>
+      <td>Challenge the Pass 1 decision without automatically agreeing with it.</td>
+      <td>
+        <code>row_id</code><br>
+        <code>sentence</code><br>
+        Pass 1 function ID, label and rationale<br>
+        controlled taxonomy
+      </td>
+      <td>
+        <code>validator_decision = accept / change / uncertain</code><br>
+        <code>function_id</code><br>
+        <code>function_label</code><br>
+        <code>confidence</code><br>
+        <code>validation_rationale</code><br>
+        <code>requires_review</code>
+      </td>
+      <td>
+        Reduces rubber-stamping by asking the second pass to decide whether another taxonomy label is clearly better.
+      </td>
+    </tr>
+
+    <tr>
+      <td><strong>Pass 3: Adjudication</strong></td>
+      <td>Make a moderated final decision where Pass 1 and Pass 2 disagree, or where confidence is low.</td>
+      <td>
+        <code>row_id</code><br>
+        <code>sentence</code><br>
+        Pass 1 output<br>
+        Pass 2 output<br>
+        controlled taxonomy
+      </td>
+      <td>
+        <code>final_function_id</code><br>
+        <code>final_function_label</code><br>
+        <code>final_confidence</code><br>
+        <code>adjudication_rationale</code><br>
+        <code>human_review_recommended</code>
+      </td>
+      <td>
+        Produces a final candidate label while keeping ambiguous cases visible for human review.
+      </td>
+    </tr>
+  </table>
+</section>
+
+<section class="warning">
+  <strong>Implementation note:</strong>
+  In the current implementation, the Pass 1, Pass 2 and Pass 3 prompt instructions are embedded inside the Python scripts.
+  The <code>prompts/</code> folder can be used as a human-readable prompt record. Later, the scripts can be refactored so that prompts are read directly from version-controlled prompt files.
 </section>
 
 </main>

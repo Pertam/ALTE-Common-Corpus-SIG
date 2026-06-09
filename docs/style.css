@@ -193,3 +193,48 @@ li {
   align-self: flex-start;
   margin-top: auto;
 }
+
+
+/* Clickable workflow cards and improved card layout */
+
+.card {
+  display: flex;
+  flex-direction: column;
+}
+
+.card p {
+  flex-grow: 1;
+}
+
+.card .button {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+.button,
+.button.secondary {
+  background: #2563eb;
+}
+
+.card-link {
+  display: flex;
+  flex-direction: column;
+  color: inherit;
+  text-decoration: none;
+}
+
+.card-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.10);
+}
+
+.read-more {
+  display: inline-block;
+  margin-top: auto;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+table code {
+  white-space: nowrap;
+}
