@@ -149,14 +149,13 @@
 <!-- AUTO-GENERATED-PROMPTS:START -->
 <section>
   <h2>Exact prompt instructions (auto-generated from the scripts)</h2>
-  <p>
-    The instruction text below is extracted automatically from the
-    version-controlled Python scripts in <code>scripts/</code>, so this page
-    always matches the code actually used in tagging runs.
-    Last extracted: 09 June 2026.
-  </p>
+  <p>The instruction text below is extracted directly from the version-controlled
+  scripts in <code>scripts/</code>, so this page always matches the code used in
+  tagging runs. Last extracted: 09 June 2026. At runtime the controlled taxonomy, the
+  sentence and (for Pass 2 and Pass 3) the previous pass output are appended below
+  these instructions, and the model must return a strict JSON object.</p>
   <details>
-    <summary>Pass 1: first-pass function tagging — exact instruction text (from <code>scripts/run_pass1.py</code>)</summary>
+    <summary>Pass 1: first-pass function tagging &mdash; exact instruction text (from <code>scripts/run_pass1.py</code>)</summary>
     <pre class="prompt-text">You are annotating ONE sentence for CEFR-derived communicative function.
 
 Do not use memory from any previous examples.
@@ -166,14 +165,9 @@ Use only a function_id from the taxonomy.
 Keep the rationale short: maximum 25 words.
 If uncertain, use confidence = low and requires_review = true.
 If there is no plausible alternative, set alternative_function_id to an empty string.</pre>
-    <p class="prompt-note">
-      At runtime, the controlled taxonomy and the sentence (and, for Pass 2 and
-      Pass 3, the previous pass outputs) are appended below these instructions.
-      The model must return a strict JSON object validated against a schema.
-    </p>
   </details>
   <details>
-    <summary>Pass 2: blind validation — exact instruction text (from <code>scripts/run_pass2.py</code>)</summary>
+    <summary>Pass 2: blind validation &mdash; exact instruction text (from <code>scripts/run_pass2.py</code>)</summary>
     <pre class="prompt-text">You are doing BLIND VALIDATION of one sentence-level CEFR-derived function tag.
 
 Your job is to validate the Pass 1 tag carefully.
@@ -191,14 +185,9 @@ Rules:
 - If genuinely ambiguous, validator_decision = uncertain and requires_review = true.
 - Keep validation_rationale short: maximum 30 words.
 - Tag what the whole sentence is doing communicatively.</pre>
-    <p class="prompt-note">
-      At runtime, the controlled taxonomy and the sentence (and, for Pass 2 and
-      Pass 3, the previous pass outputs) are appended below these instructions.
-      The model must return a strict JSON object validated against a schema.
-    </p>
   </details>
   <details>
-    <summary>Pass 3: adjudication — exact instruction text (from <code>scripts/run_pass3.py</code>)</summary>
+    <summary>Pass 3: adjudication &mdash; exact instruction text (from <code>scripts/run_pass3.py</code>)</summary>
     <pre class="prompt-text">You are making the final moderated decision for one CEFR-derived sentence-level function tag.
 
 Use the controlled taxonomy only.
@@ -208,11 +197,6 @@ If Pass 1 and Pass 2 disagree, choose the label that best captures what the whol
 Do not simply average the two previous answers.
 Keep adjudication_rationale short: maximum 35 words.
 Mark human_review_recommended true only if the case remains genuinely ambiguous.</pre>
-    <p class="prompt-note">
-      At runtime, the controlled taxonomy and the sentence (and, for Pass 2 and
-      Pass 3, the previous pass outputs) are appended below these instructions.
-      The model must return a strict JSON object validated against a schema.
-    </p>
   </details>
 </section>
 <!-- AUTO-GENERATED-PROMPTS:END -->
