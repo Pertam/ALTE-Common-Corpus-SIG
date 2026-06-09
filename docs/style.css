@@ -238,3 +238,14 @@ li {
 table code {
   white-space: nowrap;
 }
+
+
+/* Pilot-status notice banner */
+.notice {
+  background: var(--warning);
+  border: 1px solid var(--warning-border);
+  border-left: 5px solid var(--warning-border);
+  border-radius: 8px;
+  padding: 0.9rem 1.2rem;
+  margin: 0 0 1.5rem;
+}
