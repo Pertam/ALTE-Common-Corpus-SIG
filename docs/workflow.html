@@ -28,7 +28,52 @@
   </div>
 </nav>
 
+<section>
+  <h2>Worked example: one sentence through the workflow</h2>
 
+  <p>
+    The example below shows how one sentence moves through the pilot workflow.
+    The labels shown here are illustrative only and are not validated CEFR data.
+  </p>
+
+  <div class="card-grid">
+
+    <div class="card">
+      <h3>Stage 1: Corpus preparation</h3>
+      <p><strong>Raw sentence:</strong></p>
+      <p><em>Could you send me the report by Friday?</em></p>
+      <p>The sentence is identified in the corpus and assigned a sentence ID.</p>
+    </div>
+
+    <div class="card">
+      <h3>Stage 2: Processing and lemma statistics</h3>
+      <p><strong>Target lemma:</strong> send</p>
+      <p>The sentence is tokenised, lemmatised and linked to the lemma <em>send</em>.</p>
+      <p>Frequency, dispersion and ARF values are calculated for the lemma across the corpus.</p>
+    </div>
+
+    <div class="card">
+      <h3>Stage 3: Sampling</h3>
+      <p><strong>Sampled sentence:</strong></p>
+      <p><em>Could you send me the report by Friday?</em></p>
+      <p>The lemma passes the ARF threshold and this sentence is selected for function tagging.</p>
+    </div>
+
+    <div class="card">
+      <h3>Stage 4: LLM function tagging</h3>
+      <p><strong>Sentence-level function:</strong></p>
+      <p>Requesting someone to do something.</p>
+      <p>The whole sentence is tagged for its communicative function, not just for the meaning of <em>send</em>.</p>
+    </div>
+
+    <div class="card">
+      <h3>Stage 5: QA and expert review</h3>
+      <p><strong>Status:</strong> provisional</p>
+      <p>The LLM-generated tag is treated as Tier 4 candidate material and checked through QA and expert review.</p>
+    </div>
+
+  </div>
+</section>
 <main>
 
 <section class="card-grid">
