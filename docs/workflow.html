@@ -27,7 +27,6 @@
     <a href="faq.html">FAQ</a>
   </div>
 </nav>
-
 <section>
   <h2>Worked example: one sentence through the workflow</h2>
 
@@ -36,44 +35,45 @@
     The labels shown here are illustrative only and are not validated CEFR data.
   </p>
 
-  <div class="card-grid">
+  <table>
+    <tr>
+      <th>Stage</th>
+      <th>What happens</th>
+      <th>Example output</th>
+    </tr>
 
-    <div class="card">
-      <h3>Stage 1: Corpus preparation</h3>
-      <p><strong>Raw sentence:</strong></p>
-      <p><em>Could you send me the report by Friday?</em></p>
-      <p>The sentence is identified in the corpus and assigned a sentence ID.</p>
-    </div>
+    <tr>
+      <td>Stage 1: Corpus preparation</td>
+      <td>The sentence is identified in the source corpus and assigned a sentence ID.</td>
+      <td><em>Could you send me the report by Friday?</em></td>
+    </tr>
 
-    <div class="card">
-      <h3>Stage 2: Processing and lemma statistics</h3>
-      <p><strong>Target lemma:</strong> send</p>
-      <p>The sentence is tokenised, lemmatised and linked to the lemma <em>send</em>.</p>
-      <p>Frequency, dispersion and ARF values are calculated for the lemma across the corpus.</p>
-    </div>
+    <tr>
+      <td>Stage 2: Processing and lemma statistics</td>
+      <td>The sentence is tokenised, lemmatised and linked to corpus statistics.</td>
+      <td>Target lemma: <strong>send</strong></td>
+    </tr>
 
-    <div class="card">
-      <h3>Stage 3: Sampling</h3>
-      <p><strong>Sampled sentence:</strong></p>
-      <p><em>Could you send me the report by Friday?</em></p>
-      <p>The lemma passes the ARF threshold and this sentence is selected for function tagging.</p>
-    </div>
+    <tr>
+      <td>Stage 3: Sampling</td>
+      <td>The lemma passes the ARF threshold and the sentence is selected for tagging.</td>
+      <td>Sample sentence retained for LLM tagging.</td>
+    </tr>
 
-    <div class="card">
-      <h3>Stage 4: LLM function tagging</h3>
-      <p><strong>Sentence-level function:</strong></p>
-      <p>Requesting someone to do something.</p>
-      <p>The whole sentence is tagged for its communicative function, not just for the meaning of <em>send</em>.</p>
-    </div>
+    <tr>
+      <td>Stage 4: LLM function tagging</td>
+      <td>The whole sentence is tagged for communicative function using the controlled taxonomy.</td>
+      <td>Illustrative function: <strong>requesting someone to do something</strong></td>
+    </tr>
 
-    <div class="card">
-      <h3>Stage 5: QA and expert review</h3>
-      <p><strong>Status:</strong> provisional</p>
-      <p>The LLM-generated tag is treated as Tier 4 candidate material and checked through QA and expert review.</p>
-    </div>
-
-  </div>
+    <tr>
+      <td>Stage 5: QA and expert review</td>
+      <td>The output is checked, exported, and reviewed by experts.</td>
+      <td>Status: <strong>provisional Tier 4 candidate material</strong></td>
+    </tr>
+  </table>
 </section>
+
 <main>
 
 <section class="card-grid">
