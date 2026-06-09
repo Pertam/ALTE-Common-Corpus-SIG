@@ -6,15 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <header>
   <div class="header-inner">
     <h1>FAQ</h1>
-    <p>Frequently asked questions about the pilot workflow.</p>
+    <p>Frequently asked questions about the European CEFR Vocabulary Atlas pilot, the workflow, review process and possible uses of the data.</p>
   </div>
 </header>
-
 
 <nav>
   <div class="nav-inner">
@@ -24,30 +24,351 @@
     <a href="technical-setup.html">Technical setup</a>
     <a href="reviewer-area.html">Reviewer area</a>
     <a href="methodology.html">Methodology</a>
-    <a href="links.html">Links</a>
     <a href="faq.html">FAQ</a>
+    <a href="further-reading.html">Further reading</a>
   </div>
 </nav>
-
 
 <main>
 
 <section>
-  <h2>Does this produce validated CEFR vocabulary data?</h2>
-  <p>No. At this stage all LLM-generated outputs are provisional candidate material.</p>
+  <h2>About the project</h2>
 
-  <h2>What is ARF?</h2>
-  <p>ARF is a dispersion-adjusted frequency measure used to avoid over-weighting lemmas that occur many times in narrow contexts.</p>
+  <table>
+    <tr>
+      <th>Question</th>
+      <th>Answer</th>
+    </tr>
 
-  <h2>Why sentence-level function tagging?</h2>
-  <p>The current task is to identify what the whole sentence is doing communicatively, not simply the topic of the sentence or the meaning of the sampled lemma.</p>
+    <tr>
+      <td>What is the ALTE Common Corpus SIG project?</td>
+      <td>
+        It is a methodological pilot supporting the development of the European CEFR Vocabulary Atlas.
+        The project explores how multilingual corpus evidence, CEFR-derived communicative functions,
+        LLM-assisted classification and expert review can be combined into a transparent workflow.
+      </td>
+    </tr>
 
-  <h2>What does Tier 4 mean?</h2>
-  <p>Tier 4 means the assignment is based on LLM-assisted or expert candidate generation without independent corroborating source evidence. It must be flagged for later validation.</p>
+    <tr>
+      <td>Is the project creating a normal vocabulary list?</td>
+      <td>
+        No. The project is not simply listing words. It treats vocabulary as concepts, senses,
+        language-specific forms, examples and communicative uses.
+      </td>
+    </tr>
+
+    <tr>
+      <td>Why is the unit of analysis a concept or sense?</td>
+      <td>
+        Because one word form can have several meanings. For example, <em>bank</em> as a financial institution
+        and <em>bank</em> as the side of a river are different concepts and should not be merged.
+      </td>
+    </tr>
+
+    <tr>
+      <td>Why not just translate English words into other languages?</td>
+      <td>
+        The English label is only a working label. The real task is to identify the underlying sense and then
+        find the most natural form or construction in each language.
+      </td>
+    </tr>
+  </table>
+</section>
+
+<section>
+  <h2>CEFR and vocabulary judgement</h2>
+
+  <table>
+    <tr>
+      <th>Question</th>
+      <th>Answer</th>
+    </tr>
+
+    <tr>
+      <td>Are CEFR vocabulary levels based only on frequency?</td>
+      <td>
+        No. Frequency is useful evidence, but CEFR judgement also depends on communicative usefulness,
+        learner need, register, transparency, morphology, polysemy, production difficulty and domain.
+      </td>
+    </tr>
+
+    <tr>
+      <td>What is the difference between receptive and productive CEFR?</td>
+      <td>
+        Receptive CEFR is the level at which a learner could reasonably understand an item in context.
+        Productive CEFR is the level at which a learner could reasonably use it correctly and appropriately.
+      </td>
+    </tr>
+
+    <tr>
+      <td>Can productive CEFR be lower than receptive CEFR?</td>
+      <td>
+        No. Productive CEFR should be the same as receptive CEFR or higher. Learners usually understand
+        items before they can produce them accurately.
+      </td>
+    </tr>
+
+    <tr>
+      <td>Can equivalent words have different CEFR levels in different languages?</td>
+      <td>
+        Yes. Cross-linguistic divergence is important data. Differences may be caused by cognate transparency,
+        morphology, register, frequency distribution, constructional difficulty or polysemy.
+      </td>
+    </tr>
+  </table>
+</section>
+
+<section>
+  <h2>Corpus evidence and sampling</h2>
+
+  <table>
+    <tr>
+      <th>Question</th>
+      <th>Answer</th>
+    </tr>
+
+    <tr>
+      <td>What corpus evidence is used?</td>
+      <td>
+        The workflow can use sentence examples, lemma frequency, frequency per million, dispersion and ARF.
+        These values help describe usage, but they do not automatically determine CEFR level.
+      </td>
+    </tr>
+
+    <tr>
+      <td>Why use ARF?</td>
+      <td>
+        ARF helps reduce the influence of items that occur often but are concentrated in a narrow part of the corpus.
+        It gives a more useful indication of distributed occurrence than raw frequency alone.
+      </td>
+    </tr>
+
+    <tr>
+      <td>Why sample sentences for lemmas?</td>
+      <td>
+        Sentence samples show how a lemma behaves in context. They make it possible to inspect not just the word,
+        but the communicative environments in which it appears.
+      </td>
+    </tr>
+
+    <tr>
+      <td>Why does the project tag sentence functions?</td>
+      <td>
+        Function tagging shows what sentences are doing communicatively: requesting, explaining, reporting,
+        evaluating, arguing, instructing and so on.
+      </td>
+    </tr>
+  </table>
+</section>
+
+<section>
+  <h2>LLM-assisted classification</h2>
+
+  <table>
+    <tr>
+      <th>Question</th>
+      <th>Answer</th>
+    </tr>
+
+    <tr>
+      <td>What does Pass 1 do?</td>
+      <td>
+        Pass 1 assigns an initial sentence-level function label using the controlled taxonomy.
+      </td>
+    </tr>
+
+    <tr>
+      <td>What does Pass 2 do?</td>
+      <td>
+        Pass 2 validates the Pass 1 decision. It can accept the label, change it, or mark the row as uncertain.
+      </td>
+    </tr>
+
+    <tr>
+      <td>What does Pass 3 do?</td>
+      <td>
+        Pass 3 adjudicates disagreement, low confidence or ambiguity and produces a final candidate label.
+      </td>
+    </tr>
+
+    <tr>
+      <td>Why use more than one pass?</td>
+      <td>
+        Multiple passes reduce simple one-shot labelling. They make disagreement, uncertainty and ambiguity visible
+        before expert review.
+      </td>
+    </tr>
+
+    <tr>
+      <td>Does the LLM decide the final answer?</td>
+      <td>
+        No. LLM output is candidate material. Expert review and later validation are needed before any stronger claim can be made.
+      </td>
+    </tr>
+  </table>
+</section>
+
+<section>
+  <h2>Reviewer questions</h2>
+
+  <table>
+    <tr>
+      <th>Question</th>
+      <th>Answer</th>
+    </tr>
+
+    <tr>
+      <td>What should reviewers focus on first?</td>
+      <td>
+        For function tagging, reviewers should read the whole sentence and decide what it is doing communicatively.
+        They should not tag only the sampled lemma.
+      </td>
+    </tr>
+
+    <tr>
+      <td>When should a reviewer accept a row?</td>
+      <td>
+        Accept a row when the proposed label is defensible and no clearly better taxonomy label is available.
+      </td>
+    </tr>
+
+    <tr>
+      <td>When should a reviewer change a row?</td>
+      <td>
+        Change a row when another function label, sense split or CEFR judgement is clearly better.
+      </td>
+    </tr>
+
+    <tr>
+      <td>When should a reviewer mark uncertainty?</td>
+      <td>
+        Mark uncertainty when the sentence is ambiguous, the sense is unclear, the language equivalent is questionable,
+        or the available taxonomy does not fit well.
+      </td>
+    </tr>
+
+    <tr>
+      <td>What makes a good reviewer comment?</td>
+      <td>
+        A good comment is short but specific. For example:
+        <em>This reports a completed past event; it is not a request or instruction.</em>
+      </td>
+    </tr>
+  </table>
+</section>
+
+<section>
+  <h2>Using the data</h2>
+
+  <table>
+    <tr>
+      <th>Question</th>
+      <th>Answer</th>
+    </tr>
+
+    <tr>
+      <td>How could the data support teaching?</td>
+      <td>
+        It could help with syllabus mapping, vocabulary sequencing, materials development, example sentence design
+        and identifying gaps in course coverage.
+      </td>
+    </tr>
+
+    <tr>
+      <td>How could the data support assessment?</td>
+      <td>
+        It could support test specification, item writing, text selection, vocabulary load checking,
+        distractor review and cross-language comparability studies.
+      </td>
+    </tr>
+
+    <tr>
+      <td>How could the data support classification?</td>
+      <td>
+        It could support sentence-function classification, text vocabulary-load profiling, concept-level CEFR
+        candidate classification and review-priority classification.
+      </td>
+    </tr>
+
+    <tr>
+      <td>Who might use the final resource?</td>
+      <td>
+        Potential users include curriculum designers, materials writers, teachers, test developers, researchers,
+        policy teams and expert reviewers.
+      </td>
+    </tr>
+  </table>
+</section>
+
+<section>
+  <h2>Technical and project structure</h2>
+
+  <table>
+    <tr>
+      <th>Question</th>
+      <th>Answer</th>
+    </tr>
+
+    <tr>
+      <td>What is GitHub used for?</td>
+      <td>
+        GitHub stores code, scripts, prompts, notebooks, taxonomy files, documentation and the public GitHub Pages site.
+      </td>
+    </tr>
+
+    <tr>
+      <td>What is Google Drive used for?</td>
+      <td>
+        Google Drive stores larger working files: raw data, interim files, LLM outputs, logs, QA reports,
+        review workbooks and exports.
+      </td>
+    </tr>
+
+    <tr>
+      <td>What is Colab used for?</td>
+      <td>
+        Colab is the execution environment for cloning the repository, mounting Drive, checking paths and running scripts.
+      </td>
+    </tr>
+
+    <tr>
+      <td>Where should I start?</td>
+      <td>
+        Start with the <a href="rationale-and-use-cases.html">Rationale</a> page, then read the
+        <a href="workflow.html">Workflow</a> page. Reviewers should also read the
+        <a href="reviewer-area.html">Reviewer area</a>.
+      </td>
+    </tr>
+  </table>
+</section>
+
+<section>
+  <h2>Related pages</h2>
+
+  <div class="card-grid">
+
+    <a class="card card-link" href="rationale-and-use-cases.html">
+      <h3>Rationale</h3>
+      <p>Why the project matters and how the data could be used.</p>
+      <span class="read-more">Open rationale →</span>
+    </a>
+
+    <a class="card card-link" href="methodology.html">
+      <h3>Methodology</h3>
+      <p>The judgement principles behind concept, CEFR and function decisions.</p>
+      <span class="read-more">Open methodology →</span>
+    </a>
+
+    <a class="card card-link" href="further-reading.html">
+      <h3>Further reading</h3>
+      <p>External references and background reading for CEFR, vocabulary, assessment and corpus work.</p>
+      <span class="read-more">Open further reading →</span>
+    </a>
+
+  </div>
 </section>
 
 </main>
-
 
 <footer>
   <div>
@@ -55,7 +376,6 @@
     European CEFR Vocabulary Atlas pilot support workflow.
   </div>
 </footer>
-
 
 </body>
 </html>
