@@ -193,8 +193,3 @@ li {
   align-self: flex-start;
   margin-top: auto;
 }
-
-.button,
-.button.secondary {
-  background: #2563eb;
-}
