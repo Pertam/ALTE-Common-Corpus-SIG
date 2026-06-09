@@ -6,15 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <header>
   <div class="header-inner">
     <h1>Methodology</h1>
-    <p>Core principles for the European CEFR Vocabulary Atlas pilot workflow.</p>
+    <p>Core methodological principles for the European CEFR Vocabulary Atlas pilot: concept-level analysis, cross-linguistic comparison, CEFR judgement, evidence handling and expert review.</p>
   </div>
 </header>
-
 
 <nav>
   <div class="nav-inner">
@@ -29,29 +29,538 @@
   </div>
 </nav>
 
-
 <main>
 
 <section>
-  <h2>Core methodological commitments</h2>
-  <ul>
-    <li>The unit of analysis is the concept or sense, not the English word.</li>
-    <li>CEFR levels are function-anchored, not frequency-anchored.</li>
-    <li>Translation equivalents may legitimately differ across languages.</li>
-    <li>Receptive and productive CEFR levels should be separated where evidence permits.</li>
-    <li>LLM-generated outputs are Tier 4 candidate material.</li>
-    <li>Unsupported evidence must not be invented.</li>
-    <li>Human expert review is required before any validation claim.</li>
-  </ul>
+  <h2>Purpose of this page</h2>
+
+  <p>
+    This page sets out the methodological principles used in the European CEFR Vocabulary Atlas pilot.
+    It does not describe the technical pipeline step by step; that is covered in the workflow pages.
+    It does not make the broader case for the project; that is covered in the rationale page.
+  </p>
+
+  <p>
+    Instead, this page explains the judgement framework behind the data: what counts as a vocabulary item, how senses are separated, how cross-linguistic equivalents are treated, and how candidate CEFR assignments should be interpreted and reviewed.
+  </p>
 </section>
 
 <section>
-  <h2>Scope</h2>
-  <p>The current pilot covers English, French, Spanish, German, and Czech. The aim is to test the methodology before any wider expansion.</p>
+  <h2>1. The unit of analysis is the concept or sense</h2>
+
+  <p>
+    The project does not treat the English word as the source item to be translated. The English label is only a working label for project management.
+    The real unit of analysis is the concept or sense.
+  </p>
+
+  <table>
+    <tr>
+      <th>Working label</th>
+      <th>Concept / sense</th>
+      <th>Why this matters</th>
+    </tr>
+
+    <tr>
+      <td><code>bank</code></td>
+      <td>Financial institution</td>
+      <td>This is one concept and should have its own concept ID.</td>
+    </tr>
+
+    <tr>
+      <td><code>bank</code></td>
+      <td>Side of a river</td>
+      <td>This is a different concept and should not be merged with the financial sense.</td>
+    </tr>
+
+    <tr>
+      <td><code>apply</code></td>
+      <td>Apply for a job or course</td>
+      <td>This sense may be realised by a construction in another language.</td>
+    </tr>
+
+    <tr>
+      <td><code>apply</code></td>
+      <td>Apply a rule or method</td>
+      <td>This is a different sense and may require a different translation equivalent.</td>
+    </tr>
+  </table>
+
+  <p>
+    This principle is essential because many cross-linguistic errors begin when an English headword is treated as if it were a single meaning.
+    In this project, polysemous forms should be split where the meanings are pedagogically, semantically or distributionally distinct.
+  </p>
+</section>
+
+<section>
+  <h2>2. English labels are project labels, not source words</h2>
+
+  <p>
+    Each concept may have an English working label, but that label should not control the analysis.
+    Reviewers and contributors should ask: <em>What is the sense being represented?</em> rather than <em>How do I translate this English word?</em>
+  </p>
+
+  <table>
+    <tr>
+      <th>Incorrect approach</th>
+      <th>Preferred approach</th>
+    </tr>
+
+    <tr>
+      <td>Translate the English word directly into each language.</td>
+      <td>Identify the underlying concept or sense, then find the natural language-specific realisation.</td>
+    </tr>
+
+    <tr>
+      <td>Assume one English headword equals one vocabulary item.</td>
+      <td>Split senses where needed and assign separate concept IDs.</td>
+    </tr>
+
+    <tr>
+      <td>Force all equivalents into the same CEFR band.</td>
+      <td>Allow equivalent concepts to differ by language where evidence or judgement supports this.</td>
+    </tr>
+  </table>
+</section>
+
+<section>
+  <h2>3. Entry types</h2>
+
+  <p>
+    Not all vocabulary knowledge is best represented as a single word. Some meanings are expressed as multiword expressions, constructions or discourse functions.
+    The project therefore allows different entry types.
+  </p>
+
+  <table>
+    <tr>
+      <th>Entry type</th>
+      <th>Description</th>
+      <th>Example</th>
+    </tr>
+
+    <tr>
+      <td><code>lexical_concept</code></td>
+      <td>A concept usually realised by a single lemma or lexical item.</td>
+      <td><em>ticket</em>, <em>doctor</em>, <em>expensive</em></td>
+    </tr>
+
+    <tr>
+      <td><code>multiword_expression</code></td>
+      <td>A stable expression that functions as a unit.</td>
+      <td><em>as soon as possible</em>, <em>by the way</em></td>
+    </tr>
+
+    <tr>
+      <td><code>construction</code></td>
+      <td>A pattern involving grammar, lexis and meaning.</td>
+      <td><em>apply for + noun</em>, <em>be interested in + noun/-ing</em></td>
+    </tr>
+
+    <tr>
+      <td><code>discourse_function</code></td>
+      <td>A recurring communicative move rather than a lexical item alone.</td>
+      <td>requesting clarification, giving a reason, changing topic</td>
+    </tr>
+  </table>
+</section>
+
+<section>
+  <h2>4. CEFR judgement is function-anchored, not frequency-only</h2>
+
+  <p>
+    Corpus frequency is useful evidence, but it is not the same as CEFR level.
+    CEFR vocabulary judgement should consider what learners need to do with the item, how useful the item is for communication, how difficult it is to understand and produce, and how it behaves across contexts.
+  </p>
+
+  <table>
+    <tr>
+      <th>Factor</th>
+      <th>Question for reviewers</th>
+    </tr>
+
+    <tr>
+      <td>Communicative usefulness</td>
+      <td>How important is this item for everyday, educational, professional or public communication?</td>
+    </tr>
+
+    <tr>
+      <td>Pedagogical salience</td>
+      <td>Is this item normally taught early because it supports common learner needs?</td>
+    </tr>
+
+    <tr>
+      <td>Transparency</td>
+      <td>Is the form transparent, cognate, morphologically simple or easy to infer?</td>
+    </tr>
+
+    <tr>
+      <td>Register</td>
+      <td>Is the item neutral, formal, technical, academic, administrative or informal?</td>
+    </tr>
+
+    <tr>
+      <td>Polysemy</td>
+      <td>Does the same form carry several senses that may belong at different levels?</td>
+    </tr>
+
+    <tr>
+      <td>Constructional complexity</td>
+      <td>Does correct use require a particular case, preposition, reflexive form, aspect or syntactic pattern?</td>
+    </tr>
+
+    <tr>
+      <td>Corpus distribution</td>
+      <td>Is the item widely dispersed, or concentrated in one narrow domain?</td>
+    </tr>
+  </table>
+</section>
+
+<section>
+  <h2>5. Receptive and productive levels are distinct</h2>
+
+  <p>
+    The project separates receptive and productive CEFR levels.
+    Receptive level refers to when a learner could reasonably understand the item in context.
+    Productive level refers to when a learner could reasonably use the item correctly and appropriately.
+  </p>
+
+  <table>
+    <tr>
+      <th>Level type</th>
+      <th>Meaning</th>
+      <th>Example judgement</th>
+    </tr>
+
+    <tr>
+      <td>Receptive CEFR</td>
+      <td>The level at which a learner could understand the item in context.</td>
+      <td>A learner may understand <em>application deadline</em> in a notice at B1.</td>
+    </tr>
+
+    <tr>
+      <td>Productive CEFR</td>
+      <td>The level at which a learner could produce the item accurately and appropriately.</td>
+      <td>The same learner may not confidently produce <em>submit an application before the deadline</em> until B2.</td>
+    </tr>
+  </table>
+
+  <p>
+    Productive CEFR may be the same as receptive CEFR or one level higher.
+    It should not be lower than receptive CEFR.
+  </p>
+</section>
+
+<section>
+  <h2>6. Cross-linguistic divergence is data, not an error</h2>
+
+  <p>
+    Equivalent-looking vocabulary items do not have to receive the same CEFR level across languages.
+    Differences should be preserved and explained rather than flattened.
+  </p>
+
+  <table>
+    <tr>
+      <th>Reason for divergence</th>
+      <th>Example issue</th>
+      <th>Possible effect</th>
+    </tr>
+
+    <tr>
+      <td>Cognate advantage</td>
+      <td>A form is transparent for learners because it resembles a known international or related-language word.</td>
+      <td>Lower receptive difficulty.</td>
+    </tr>
+
+    <tr>
+      <td>Morphological load</td>
+      <td>The equivalent requires case marking, agreement, aspect, gender or complex inflection.</td>
+      <td>Higher productive difficulty.</td>
+    </tr>
+
+    <tr>
+      <td>Register difference</td>
+      <td>The natural equivalent is more formal or technical in one language than in another.</td>
+      <td>Higher CEFR placement or narrower domain coverage.</td>
+    </tr>
+
+    <tr>
+      <td>Constructional realisation</td>
+      <td>A concept is expressed by a phrase or construction rather than a single word.</td>
+      <td>May require treatment as a construction rather than lexical concept.</td>
+    </tr>
+
+    <tr>
+      <td>Polysemy mismatch</td>
+      <td>One language uses the same form for several senses; another uses different forms.</td>
+      <td>Requires separate sense-level rows.</td>
+    </tr>
+  </table>
+</section>
+
+<section>
+  <h2>7. Function evidence and vocabulary evidence are connected but different</h2>
+
+  <p>
+    The function-tagging part of the workflow classifies what whole sentences are doing communicatively.
+    It does not classify the sampled lemma in isolation.
+  </p>
+
+  <table>
+    <tr>
+      <th>Sentence</th>
+      <th>Sampled lemma</th>
+      <th>Sentence-level function</th>
+      <th>Methodological point</th>
+    </tr>
+
+    <tr>
+      <td><em>Could you send me the report by Friday?</em></td>
+      <td><code>send</code></td>
+      <td>Requesting action</td>
+      <td>The whole sentence performs a request.</td>
+    </tr>
+
+    <tr>
+      <td><em>The company sent the report yesterday.</em></td>
+      <td><code>send</code></td>
+      <td>Reporting a past event</td>
+      <td>The same lemma occurs in a different communicative function.</td>
+    </tr>
+
+    <tr>
+      <td><em>Please send the form to the address below.</em></td>
+      <td><code>send</code></td>
+      <td>Giving an instruction</td>
+      <td>The function is directive, but not necessarily a polite request.</td>
+    </tr>
+  </table>
+
+  <p>
+    Over many examples, the distribution of functions around a lemma can help describe its functional environment.
+    This may later support learning, assessment and classification use cases.
+  </p>
+</section>
+
+<section>
+  <h2>8. Evidence handling</h2>
+
+  <p>
+    The project distinguishes between supplied evidence, derived evidence, expert judgement and LLM-generated candidate material.
+    Unsupported evidence should not be invented.
+  </p>
+
+  <table>
+    <tr>
+      <th>Evidence type</th>
+      <th>Examples</th>
+      <th>How to handle it</th>
+    </tr>
+
+    <tr>
+      <td>Corpus-derived evidence</td>
+      <td>Raw frequency, frequency per million, dispersion, ARF, sentence examples.</td>
+      <td>Record values when calculated by the pipeline.</td>
+    </tr>
+
+    <tr>
+      <td>Published CEFR-aligned source evidence</td>
+      <td>Validated vocabulary lists, exam specifications, reference-level descriptions, published learner resources.</td>
+      <td>Record source details only when actually supplied or verified.</td>
+    </tr>
+
+    <tr>
+      <td>Expert review evidence</td>
+      <td>Reviewer decisions, comments, corrections and adjudication notes.</td>
+      <td>Preserve comments and decision history.</td>
+    </tr>
+
+    <tr>
+      <td>LLM-generated candidate material</td>
+      <td>Initial CEFR guesses, function tags, rationales, uncertainty notes.</td>
+      <td>Mark clearly as LLM judgement and route to review.</td>
+    </tr>
+  </table>
+
+  <p>
+    Fields for evidence that has not been supplied should remain empty or null.
+    The project should not fabricate corpus counts, CEFR source levels, EVP levels, frequency ranks or validation evidence.
+  </p>
+</section>
+
+<section>
+  <h2>9. Confidence and review status</h2>
+
+  <p>
+    Confidence values indicate how plausible a candidate decision is before expert validation.
+    They should be used to prioritise review, not to claim final correctness.
+  </p>
+
+  <table>
+    <tr>
+      <th>Confidence range</th>
+      <th>Interpretation</th>
+      <th>Review implication</th>
+    </tr>
+
+    <tr>
+      <td><code>0.85–0.90</code></td>
+      <td>Highly plausible candidate judgement.</td>
+      <td>Still reviewable, but lower priority than uncertain rows.</td>
+    </tr>
+
+    <tr>
+      <td><code>0.70–0.84</code></td>
+      <td>Plausible but needs validation.</td>
+      <td>Normal expert review.</td>
+    </tr>
+
+    <tr>
+      <td><code>0.55–0.69</code></td>
+      <td>Uncertain; affected by polysemy, register, morphology or cross-linguistic mismatch.</td>
+      <td>Review required.</td>
+    </tr>
+
+    <tr>
+      <td><code>0.50–0.54</code></td>
+      <td>Highly uncertain.</td>
+      <td>High-priority expert review.</td>
+    </tr>
+  </table>
+
+  <p>
+    LLM-generated confidence should not use <code>1.00</code>.
+    Pilot outputs should normally use <code>review_status = provisional</code>, with <code>review_required</code> used where uncertainty is high.
+  </p>
+</section>
+
+<section>
+  <h2>10. Example methodological decision path</h2>
+
+  <p>
+    The following example shows the type of reasoning expected for a concept-level vocabulary judgement.
+    The values are illustrative.
+  </p>
+
+  <table>
+    <tr>
+      <th>Decision point</th>
+      <th>Example judgement</th>
+    </tr>
+
+    <tr>
+      <td>Concept / sense</td>
+      <td><code>apply — apply for a job/course</code>, not <code>apply a rule</code>.</td>
+    </tr>
+
+    <tr>
+      <td>Entry type</td>
+      <td><code>construction</code>, because several languages may realise the concept through a phrase or governed pattern.</td>
+    </tr>
+
+    <tr>
+      <td>Domain</td>
+      <td><code>work</code> and <code>education</code>.</td>
+    </tr>
+
+    <tr>
+      <td>Receptive judgement</td>
+      <td>Learners may understand the item in application forms, course pages or job adverts before they can use it confidently.</td>
+    </tr>
+
+    <tr>
+      <td>Productive judgement</td>
+      <td>Productive use may be one level higher if correct preposition, reflexive form, case pattern or collocation is required.</td>
+    </tr>
+
+    <tr>
+      <td>Cross-linguistic note</td>
+      <td>Do not force English <em>apply</em>, German <em>sich bewerben</em> and Czech <em>žádat o</em> into the same analysis as simple word translations.</td>
+    </tr>
+
+    <tr>
+      <td>Review status</td>
+      <td>Mark as provisional or review-required depending on uncertainty and available evidence.</td>
+    </tr>
+  </table>
+</section>
+
+<section>
+  <h2>11. Reviewer interpretation</h2>
+
+  <p>
+    Reviewers should treat project outputs as structured candidate material.
+    The aim is not to agree with the machine, but to inspect whether the sense, language form, CEFR judgement, function evidence and review status are defensible.
+  </p>
+
+  <table>
+    <tr>
+      <th>Reviewer question</th>
+      <th>What to check</th>
+    </tr>
+
+    <tr>
+      <td>Is the sense correctly identified?</td>
+      <td>Check whether the row represents one clear concept or whether senses have been merged.</td>
+    </tr>
+
+    <tr>
+      <td>Is the language equivalent natural?</td>
+      <td>Check whether the form is actually used in the target language for this concept.</td>
+    </tr>
+
+    <tr>
+      <td>Is the CEFR judgement plausible?</td>
+      <td>Consider communicative usefulness, register, morphology, transparency and learner difficulty.</td>
+    </tr>
+
+    <tr>
+      <td>Is receptive/productive separation sensible?</td>
+      <td>Productive level should not be below receptive level.</td>
+    </tr>
+
+    <tr>
+      <td>Is evidence being overstated?</td>
+      <td>Check that unsupported source claims or frequency values have not been invented.</td>
+    </tr>
+
+    <tr>
+      <td>Should the row be escalated?</td>
+      <td>Mark rows for further review where ambiguity, mismatch or uncertainty remains.</td>
+    </tr>
+  </table>
+</section>
+
+<section>
+  <h2>12. Relationship with other site pages</h2>
+
+  <p>
+    This methodology page defines the judgement principles.
+    For other aspects of the project, use the linked pages below.
+  </p>
+
+  <div class="card-grid">
+
+    <a class="card card-link" href="rationale-and-use-cases.html">
+      <h3>Rationale and use cases</h3>
+      <p>Why the project matters and how the data could support learning, assessment, classification, research and policy.</p>
+      <span class="read-more">Open rationale →</span>
+    </a>
+
+    <a class="card card-link" href="workflow.html">
+      <h3>Workflow</h3>
+      <p>The staged process from corpus preparation to function tagging, QA and expert review.</p>
+      <span class="read-more">Open workflow →</span>
+    </a>
+
+    <a class="card card-link" href="reviewer-area.html">
+      <h3>Reviewer area</h3>
+      <p>Practical guidance for reviewers working with candidate outputs and review workbooks.</p>
+      <span class="read-more">Open reviewer area →</span>
+    </a>
+
+  </div>
 </section>
 
 </main>
-
 
 <footer>
   <div>
@@ -59,7 +568,6 @@
     European CEFR Vocabulary Atlas pilot support workflow.
   </div>
 </footer>
-
 
 </body>
 </html>
