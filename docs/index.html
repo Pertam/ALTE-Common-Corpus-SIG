@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <header>
@@ -14,7 +15,6 @@
     <p>A reproducible pilot workflow for corpus processing, CEFR function tagging, and expert review across English, French, Spanish, German, and Czech.</p>
   </div>
 </header>
-
 
 <nav>
   <div class="nav-inner">
@@ -28,69 +28,76 @@
   </div>
 </nav>
 
-
 <main>
 
-<section class="warning">
-  <strong>Pilot material — not validated CEFR data.</strong><br>
-  This project is methodological and exploratory. LLM-generated outputs are provisional Tier 4 candidate material for later expert review, corpus validation, and comparison with published CEFR-aligned resources.
-</section>
+  <section class="warning">
+    <strong>Pilot material — not validated CEFR data.</strong><br>
+    This project is methodological and exploratory. LLM-generated outputs are provisional Tier 4 candidate material for later expert review, corpus validation, and comparison with published CEFR-aligned resources.
+  </section>
 
-<section>
-  <h2>Project status</h2>
-  <div class="card-grid">
-    <div class="card">
-      <h3>Current stage</h3>
-      <p><strong>Pilot setup and workflow validation</strong></p>
-      <p>GitHub, Drive and Colab are being connected. The next step is validating the English sample pipeline.</p>
-    </div>
-    <div class="card">
-      <h3>Data status</h3>
-      <p><strong>Provisional Tier 4</strong></p>
-      <p>All LLM-generated material remains candidate output until reviewed by experts.</p>
-    </div>
-    <div class="card">
-      <h3>Next milestone</h3>
-      <p><strong>First complete Stage 5 run</strong></p>
-      <p>Run the English sample through Pass 1, Pass 2, Pass 3, QA, and workbook export.</p>
-    </div>
-  </div>
-</section>
+  <section>
+    <h2>Project status</h2>
 
-<section>
-  <h2>What this project does</h2>
-  <p>The ALTE Common Corpus SIG project develops a repeatable workflow for corpus preparation, lemmatisation, ARF-based sampling, sentence-level CEFR communicative function tagging, and expert review.</p>
-  <p>It supports the European CEFR Vocabulary Atlas pilot by creating a transparent technical pipeline that can be shared, inspected, repeated, and improved by SIG members.</p>
-</section>
+    <div class="card-grid">
+      <div class="card">
+        <h3>Current stage</h3>
+        <p><strong>Pilot setup and workflow validation</strong></p>
+        <p>GitHub, Google Drive and Colab are connected. The next step is validating the English sample pipeline.</p>
+      </div>
 
-<section>
-  <h2>Core project links</h2>
-  <div class="card-grid">
-    <div class="card">
-      <h3>GitHub</h3>
-      <p>Code, prompts, configuration, notebooks, methodology, and small samples.</p>
-      <a class="button" href="https://github.com/Pertam/ALTE-Common-Corpus-SIG">Open GitHub</a>
+      <div class="card">
+        <h3>Data status</h3>
+        <p><strong>Provisional Tier 4</strong></p>
+        <p>All LLM-generated material remains candidate output until reviewed by experts.</p>
+      </div>
+
+      <div class="card">
+        <h3>Next milestone</h3>
+        <p><strong>First complete function-tagging run</strong></p>
+        <p>Run the English sample through Pass 1, Pass 2, Pass 3, QA, and workbook export.</p>
+      </div>
     </div>
-    <div class="card">
-  <h3>Google Drive</h3>
-  <p>Raw data, interim files, LLM outputs, QA reports, logs, and review workbooks.</p>
-  <a class="button secondary" href="https://drive.google.com/drive/folders/1w1kzdFLY1yn5"
+  </section>
+
+  <section>
+    <h2>What this project does</h2>
+    <p>The ALTE Common Corpus SIG project develops a repeatable workflow for corpus preparation, lemmatisation, ARF-based sampling, sentence-level CEFR communicative function tagging, and expert review.</p>
+    <p>It supports the European CEFR Vocabulary Atlas pilot by creating a transparent technical pipeline that can be shared, inspected, repeated, and improved by SIG members.</p>
+  </section>
+
+  <section>
+    <h2>Core project links</h2>
+
+    <div class="card-grid">
+
+      <div class="card">
+        <h3>GitHub</h3>
+        <p>Code, prompts, configuration, notebooks, methodology, website files, and small samples.</p>
+        <a class="button" href="https://github.com/Pertam/ALTE-Common-Corpus-SIG">Open GitHub</a>
+      </div>
+
+      <div class="card">
+        <h3>Google Drive</h3>
+        <p>Raw data, interim files, LLM outputs, QA reports, logs, and review workbooks.</p>
+        <a class="button secondary" href="https://drive.google.com/drive/folders/1w1kzdFLY1yn5vJ2xIOYJjVqYCf1JFv8t">Open Drive</a>
+      </div>
+
+      <div class="card">
+        <h3>Colab</h3>
+        <p>Main project runner for cloning GitHub, mounting Drive, checking paths, and running the pipeline scripts.</p>
+        <a class="button secondary" href="https://colab.research.google.com/github/Pertam/ALTE-Common-Corpus-SIG/blob/main/notebooks/00_main_project_runner_colab.ipynb">Open Colab</a>
+      </div>
+
+      <div class="card">
+        <h3>Review area</h3>
+        <p>Guidance for expert review of provisional LLM-generated function-tagging outputs.</p>
+        <a class="button secondary" href="reviewer-area.html">Open Review Area</a>
+      </div>
+
     </div>
-    <div class="card">
-      <h3>Colab</h3>
-      <p>Runnable notebook for cloning GitHub, mounting Drive, and executing the pipeline.</p>
-      <a class="button secondary" href="#">Add Colab link</a>
-    </div>
-    <div class="card">
-      <h3>NotebookLM</h3>
-      <p>Project explainer for methodology, reviewer guidance, and workflow questions.</p>
-      <a class="button secondary" href="#">Add NotebookLM link</a>
-    </div>
-  </div>
-</section>
+  </section>
 
 </main>
-
 
 <footer>
   <div>
@@ -98,7 +105,6 @@
     European CEFR Vocabulary Atlas pilot support workflow.
   </div>
 </footer>
-
 
 </body>
 </html>
