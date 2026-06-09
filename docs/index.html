@@ -1,8 +1,13 @@
-<!doctype html>
+from pathlib import Path
+
+DOCS = Path("/content/ALTE-Common-Corpus-SIG/docs")
+DOCS.mkdir(parents=True, exist_ok=True)
+
+index_html = """<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>ALTE Common Corpus SIG | ALTE Common Corpus SIG</title>
+  <title>ALTE Common Corpus SIG | European CEFR Vocabulary Atlas Pilot</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -12,7 +17,7 @@
 <header>
   <div class="header-inner">
     <h1>ALTE Common Corpus SIG</h1>
-    <p>A reproducible pilot workflow for corpus processing, CEFR function tagging, and expert review across English, French, Spanish, German, and Czech.</p>
+    <p>Supporting the development of the European CEFR Vocabulary Atlas: a cross-linguistic, sense-level and function-aware vocabulary research workflow.</p>
   </div>
 </header>
 
@@ -31,66 +36,144 @@
 
 <main>
 
-  <section class="warning">
-    <strong>Pilot material — not validated CEFR data.</strong><br>
-    This project is methodological and exploratory. LLM-generated outputs are provisional Tier 4 candidate material for later expert review, corpus validation, and comparison with published CEFR-aligned resources.
-  </section>
+<section>
+  <h2>Project overview</h2>
 
-  <section>
-    <h2>Project status</h2>
+  <p>
+    This site documents the working infrastructure for the ALTE Common Corpus SIG contribution to the European CEFR Vocabulary Atlas pilot.
+    The project explores how corpus evidence, CEFR-derived communicative functions, multilingual vocabulary alignment, LLM-assisted classification and expert review can be combined in a transparent workflow.
+  </p>
 
-    <div class="card-grid">
-      <div class="card">
-        <h3>Current stage</h3>
-        <p><strong>Pilot setup and workflow validation</strong></p>
-        <p>GitHub, Google Drive and Colab are connected. The next step is validating the English sample pipeline.</p>
-      </div>
+  <p>
+    The aim is to move beyond simple word lists towards a richer model of vocabulary as concepts, senses, language-specific forms, corpus examples and communicative uses.
+  </p>
+</section>
 
-      <div class="card">
-        <h3>Data status</h3>
-        <p><strong>Provisional Tier 4</strong></p>
-        <p>All LLM-generated material remains candidate output until reviewed by experts.</p>
-      </div>
+<section>
+  <h2>Start here</h2>
 
-      <div class="card">
-        <h3>Next milestone</h3>
-        <p><strong>First complete function-tagging run</strong></p>
-        <p>Run the English sample through Pass 1, Pass 2, Pass 3, QA, and workbook export.</p>
-      </div>
-    </div>
-  </section>
+  <div class="card-grid">
 
-  <section>
-    <h2>What this project does</h2>
-    <p>The ALTE Common Corpus SIG project develops a repeatable workflow for corpus preparation, lemmatisation, ARF-based sampling, sentence-level CEFR communicative function tagging, and expert review.</p>
-    <p>It supports the European CEFR Vocabulary Atlas pilot by creating a transparent technical pipeline that can be shared, inspected, repeated, and improved by SIG members.</p>
-  </section>
+    <a class="card card-link" href="rationale-and-use-cases.html">
+      <h3>Why this project matters</h3>
+      <p>
+        Read the rationale for the project and see how the data could support learning, teaching, assessment, classification, research and policy.
+      </p>
+      <span class="read-more">Open rationale →</span>
+    </a>
 
-  <section>
-  <section>
-  <h2>Core project links</h2>
+    <a class="card card-link" href="workflow.html">
+      <h3>How the workflow works</h3>
+      <p>
+        See the five-stage workflow from corpus preparation to function tagging, QA and expert review.
+      </p>
+      <span class="read-more">Open workflow →</span>
+    </a>
+
+    <a class="card card-link" href="methodology.html">
+      <h3>Methodological principles</h3>
+      <p>
+        Review the project principles: concept-level analysis, sense distinction, receptive/productive separation and cross-linguistic comparison.
+      </p>
+      <span class="read-more">Open methodology →</span>
+    </a>
+
+  </div>
+</section>
+
+<section>
+  <h2>Project infrastructure</h2>
+
+  <p>
+    The project uses GitHub for public project structure and code, Google Drive for larger working data and outputs, and Colab for running the reproducible workflow.
+  </p>
 
   <div class="card-grid">
 
     <div class="card">
       <h3>GitHub</h3>
-      <p>Code, prompts, configuration, notebooks, methodology, website files, and small samples.</p>
+      <p>
+        Code, scripts, prompts, notebooks, taxonomy files, configuration, documentation and the GitHub Pages site.
+      </p>
       <a class="button" href="https://github.com/Pertam/ALTE-Common-Corpus-SIG">Open GitHub</a>
     </div>
 
     <div class="card">
       <h3>Google Drive</h3>
-      <p>Raw data, interim files, LLM outputs, QA reports, logs, and review workbooks.</p>
+      <p>
+        Raw data, interim files, LLM outputs, QA reports, review workbooks, logs and export files.
+      </p>
       <a class="button" href="https://drive.google.com/drive/folders/1w1kzdFLY1yn5vJ2xIOYJjVqYCf1JFv8t">Open Drive</a>
     </div>
 
     <div class="card">
       <h3>Colab</h3>
-      <p>Main project runner for cloning GitHub, mounting Drive, checking paths, and running the pipeline scripts.</p>
+      <p>
+        Main execution environment for cloning GitHub, mounting Drive, checking paths and running the pipeline scripts.
+      </p>
       <a class="button" href="https://colab.research.google.com/github/Pertam/ALTE-Common-Corpus-SIG/blob/main/notebooks/00_main_project_runner_colab.ipynb">Open Colab</a>
     </div>
 
   </div>
+</section>
+
+<section>
+  <h2>Who the site is for</h2>
+
+  <table>
+    <tr>
+      <th>User group</th>
+      <th>Most useful pages</th>
+    </tr>
+
+    <tr>
+      <td>SIG members and project readers</td>
+      <td>
+        <a href="rationale-and-use-cases.html">Rationale</a>,
+        <a href="workflow.html">Workflow</a>,
+        <a href="methodology.html">Methodology</a>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Technical contributors</td>
+      <td>
+        <a href="technical-setup.html">Technical setup</a>,
+        <a href="workflow.html">Workflow</a>,
+        <a href="links.html">Links</a>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Reviewers</td>
+      <td>
+        <a href="reviewer-area.html">Reviewer area</a>,
+        <a href="methodology.html">Methodology</a>,
+        <a href="stage5-qa-review.html">QA and expert review</a>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Assessment, curriculum and policy readers</td>
+      <td>
+        <a href="rationale-and-use-cases.html">Rationale</a>,
+        <a href="methodology.html">Methodology</a>,
+        <a href="workflow.html">Workflow</a>
+      </td>
+    </tr>
+  </table>
+</section>
+
+<section>
+  <h2>Current project focus</h2>
+
+  <p>
+    The current pilot focuses on five languages: English, French, Spanish, German and Czech. It connects corpus-derived lemma evidence with sentence-level communicative function tagging, then prepares outputs for review and later validation.
+  </p>
+
+  <p>
+    The work is especially concerned with preserving cross-linguistic differences rather than forcing equivalent-looking words into the same level or category.
+  </p>
 </section>
 
 </main>
@@ -104,3 +187,8 @@
 
 </body>
 </html>
+"""
+
+(DOCS / "index.html").write_text(index_html, encoding="utf-8")
+
+print("Updated:", DOCS / "index.html")
