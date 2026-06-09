@@ -1,9 +1,4 @@
-from pathlib import Path
-
-DOCS = Path("/content/ALTE-Common-Corpus-SIG/docs")
-DOCS.mkdir(parents=True, exist_ok=True)
-
-index_html = """<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -187,8 +182,3 @@ index_html = """<!doctype html>
 
 </body>
 </html>
-"""
-
-(DOCS / "index.html").write_text(index_html, encoding="utf-8")
-
-print("Updated:", DOCS / "index.html")
