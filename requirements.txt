@@ -1,4 +1,15 @@
+pandas>=2.2.0
+pyarrow>=15.0.0
+numpy>=1.26.0
+tqdm>=4.66.0
+spacy>=3.7.0
+stanza>=1.8.0
+scikit-learn>=1.4.0
 openai>=1.40.0
-pandas>=2.0.0
-tenacity>=8.2.0
 python-dotenv>=1.0.0
+tenacity>=8.2.0
+pydantic>=2.6.0
+nbformat>=5.9.0
+openpyxl>=3.1.0
+xlsxwriter>=3.2.0
+pyyaml>=6.0.0
