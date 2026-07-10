@@ -1,143 +1,17 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Stage 2: Processing and Lemma Statistics | ALTE Common Corpus SIG</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-
-<header>
-  <div class="header-inner">
-    <h1>Stage 2: Processing and Lemma Statistics</h1>
-    <p>Convert raw corpus text into sentence, token, lemma and frequency evidence for later sampling and review.</p>
-  </div>
-</header>
-
-
-<nav>
-  <div class="nav-inner">
-    <a href="index.html">Home</a>
-    <a href="rationale-and-use-cases.html">Rationale</a>
-    <a href="workflow.html">Workflow</a>
-    <a href="technical-setup.html">Technical setup</a>
-    <a href="reviewer-area.html">Reviewer area</a>
-    <a href="methodology.html">Methodology</a>
-    <a href="faq.html">FAQ</a>
-    <a href="further-reading.html">Further reading</a>
-  </div>
-</nav>
-
-
-<main>
-
-<section class="warning">
-  <strong>Purpose:</strong> Stage 2 turns raw text into structured linguistic data: sentences, tokens, lemmas, POS tags and lemma statistics.
-</section>
-
-<section>
-  <h2>What happens in this stage?</h2>
-  <p>
-    The corpus is processed using language-appropriate NLP tools. The output should allow the project to connect each sampled lemma to all the sentences in which it appears.
-  </p>
-</section>
-
-<section>
-  <h2>Core processing steps</h2>
-  <table>
-    <tr><th>Step</th><th>Description</th><th>Example output</th></tr>
-    <tr>
-      <td>Sentence splitting</td>
-      <td>Corpus text is divided into individual sentences.</td>
-      <td><code>sentence_id = en_00018452</code></td>
-    </tr>
-    <tr>
-      <td>Tokenisation</td>
-      <td>Each sentence is split into tokens.</td>
-      <td><code>Could | you | send | me | the | report | by | Friday | ?</code></td>
-    </tr>
-    <tr>
-      <td>POS tagging</td>
-      <td>Each token receives a part-of-speech tag.</td>
-      <td><code>send = VERB</code></td>
-    </tr>
-    <tr>
-      <td>Lemmatisation</td>
-      <td>Inflected forms are linked to dictionary-style lemmas.</td>
-      <td><code>sent, sends, sending → send</code></td>
-    </tr>
-    <tr>
-      <td>Lemma statistics</td>
-      <td>Raw frequency, frequency per million, dispersion and ARF are calculated.</td>
-      <td><code>arf_per_million = 58.7</code></td>
-    </tr>
-  </table>
-</section>
-
-<section>
-  <h2>Example token row</h2>
-  <table>
-    <tr><th>Column</th><th>Example value</th></tr>
-    <tr><td><code>language</code></td><td><code>en</code></td></tr>
-    <tr><td><code>sentence_id</code></td><td><code>en_00018452</code></td></tr>
-    <tr><td><code>token</code></td><td><code>send</code></td></tr>
-    <tr><td><code>lemma</code></td><td><code>send</code></td></tr>
-    <tr><td><code>pos</code></td><td><code>VERB</code></td></tr>
-    <tr><td><code>token_index</code></td><td><code>3</code></td></tr>
-  </table>
-</section>
-
-<section>
-  <h2>Example lemma statistics row</h2>
-  <table>
-    <tr><th>Column</th><th>Example value</th></tr>
-    <tr><td><code>lemma</code></td><td><code>send</code></td></tr>
-    <tr><td><code>pos</code></td><td><code>VERB</code></td></tr>
-    <tr><td><code>raw_frequency</code></td><td><code>1,284</code></td></tr>
-    <tr><td><code>frequency_per_million</code></td><td><code>64.2</code></td></tr>
-    <tr><td><code>dispersion</code></td><td><code>0.82</code></td></tr>
-    <tr><td><code>arf_per_million</code></td><td><code>58.7</code></td></tr>
-  </table>
-</section>
-
-<section>
-  <h2>Output folders</h2>
-  <table>
-    <tr><th>Output</th><th>Folder</th></tr>
-    <tr><td>Token files</td><td><code>Drive/data/interim/{lang}/tokens/</code></td></tr>
-    <tr><td>Lemma-sentence index</td><td><code>Drive/data/interim/{lang}/lemma_sentence_index/</code></td></tr>
-    <tr><td>Lemma statistics</td><td><code>Drive/data/interim/{lang}/lemma_stats/</code></td></tr>
-    <tr><td>Filtered lemmas</td><td><code>Drive/data/interim/{lang}/filtered_lemmas/</code></td></tr>
-  </table>
-</section>
-
-<section>
-  <h2>Checks and risks</h2>
-  <ul>
-    <li>POS tagging and lemmatisation quality may vary by language.</li>
-    <li>Czech and other morphologically rich languages require particular care.</li>
-    <li>Content-word filtering should normally use <code>NOUN</code>, <code>VERB</code>, <code>ADJ</code> and <code>ADV</code>.</li>
-    <li>Frequency is supporting evidence only; it is not a direct CEFR-level assignment.</li>
-  </ul>
-</section>
-
-<section>
-  <p><a class="button" href="workflow.html">← Back to workflow overview</a></p>
-</section>
-
-</main>
-
-
-<footer>
-  <div>
-    <strong>ALTE Common Corpus SIG</strong><br>
-    European CEFR Vocabulary Atlas pilot support workflow.<br>
-    <a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG">Project repository on GitHub</a> · <a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG/issues">Questions and feedback</a> · Last updated 09 June 2026.
-  </div>
-</footer>
-
-
-</body>
-</html>
+<html lang="en"><head><meta charset="utf-8"><title>Stage 2: Processing and lemma statistics | ALTE Common Corpus SIG</title><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="style.css"></head><body><a class="skip-link" href="#main-content">Skip to main content</a><header><div class="header-inner"><p class="eyebrow">ALTE Common Corpus SIG · European CEFR Vocabulary Atlas pilot</p><h1>Stage 2: Processing and lemma statistics</h1><p>Tokenisation, POS tagging, lemmatisation and pilot statistics.</p></div></header><nav aria-label="Primary navigation"><div class="nav-inner">
+      <a href="index.html">Start here</a>
+      <a href="rationale-and-use-cases.html">Project overview</a>
+      <a href="current-status.html">Current status</a>
+      <a href="data-and-access.html">Data and access</a>
+      <a href="workflow.html">Workflow</a>
+      <a href="reviewer-area.html">Reviewer guidance</a>
+      <a href="technical-setup.html">Technical guidance</a>
+      <a href="methodology.html">Methodology</a>
+      <a href="governance-and-validation.html">Governance and validation</a>
+      <a href="outputs-and-releases.html">Outputs and releases</a>
+      <a href="faq.html">FAQ</a>
+      <a href="contact-and-support.html">Contact and support</a>
+  </div></nav><main id="main-content">
+<section class="warning"><strong>Provisional candidate material — not validated CEFR data.</strong><br>Current automated outputs are model-generated candidate material for expert review. They are not validated CEFR vocabulary data, not approved Atlas releases, and must not be cited as validated findings.</section><section><h2>Status</h2><p><span class="label implemented">Implemented prototype</span> Scripts exist for tokenisation/lemmatisation and lemma statistics. The frequency statistic should be called a pilot dispersion-adjusted frequency measure, not validated standard ARF evidence.</p></section>
+</main><footer><div><strong>ALTE Common Corpus SIG</strong><br>Public website for the European CEFR Vocabulary Atlas pilot support workflow.<br><a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG">Repository</a> · <a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG/issues">Report an issue</a><br>Last updated: 10 July 2026. Source branch: <code>website/one-stop-shop-revision</code>. Build commit: <span class="decision">PROJECT-LEAD DECISION REQUIRED</span> / technical action: configure GitHub Pages to expose the deployed commit SHA.</div></footer></body></html>

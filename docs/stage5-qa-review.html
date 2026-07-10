@@ -1,149 +1,17 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Stage 5: QA and Expert Review | ALTE Common Corpus SIG</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-
-<header>
-  <div class="header-inner">
-    <h1>Stage 5: QA and Expert Review</h1>
-    <p>Check, package and review provisional function-tagging outputs before any validation claim is made.</p>
-  </div>
-</header>
-
-
-<nav>
-  <div class="nav-inner">
-    <a href="index.html">Home</a>
-    <a href="rationale-and-use-cases.html">Rationale</a>
-    <a href="workflow.html">Workflow</a>
-    <a href="technical-setup.html">Technical setup</a>
-    <a href="reviewer-area.html">Reviewer area</a>
-    <a href="methodology.html">Methodology</a>
-    <a href="faq.html">FAQ</a>
-    <a href="further-reading.html">Further reading</a>
-  </div>
-</nav>
-
-
-<main>
-
-<section class="warning">
-  <strong>Purpose:</strong> Stage 5 checks, packages and prepares provisional outputs for expert review.
-</section>
-
-<section>
-  <h2>What happens in this stage?</h2>
-  <p>
-    The output of the LLM tagging passes is checked for structural validity, taxonomy validity, consistency and review needs.
-    Reviewer-facing files are then created so that human experts can inspect, correct and comment on candidate outputs.
-  </p>
-</section>
-
-<section>
-  <h2>QA checks</h2>
-  <table>
-    <tr><th>Check</th><th>Why it matters</th></tr>
-    <tr>
-      <td>Required columns present</td>
-      <td>Prevents broken downstream processing.</td>
-    </tr>
-    <tr>
-      <td>Valid taxonomy IDs</td>
-      <td>Ensures the model has not invented labels.</td>
-    </tr>
-    <tr>
-      <td>Pass 1 / Pass 2 disagreement</td>
-      <td>Identifies cases for adjudication or expert review.</td>
-    </tr>
-    <tr>
-      <td>Low confidence or uncertainty</td>
-      <td>Ensures uncertain cases remain visible.</td>
-    </tr>
-    <tr>
-      <td>Review status assigned</td>
-      <td>Separates plausible provisional rows from rows needing attention.</td>
-    </tr>
-    <tr>
-      <td>Provenance marked</td>
-      <td>Prevents LLM output being mistaken for validated evidence.</td>
-    </tr>
-  </table>
-</section>
-
-<section>
-  <h2>Example final candidate row</h2>
-  <table>
-    <tr><th>Column</th><th>Example value</th></tr>
-    <tr><td><code>row_id</code></td><td><code>en_send_0001</code></td></tr>
-    <tr><td><code>sentence</code></td><td><em>Could you send me the report by Friday?</em></td></tr>
-    <tr><td><code>final_function_id</code></td><td><code>DIR_03</code></td></tr>
-    <tr><td><code>final_function_label</code></td><td><code>requesting action</code></td></tr>
-    <tr><td><code>final_confidence</code></td><td><code>high</code></td></tr>
-    <tr><td><code>cefr_source</code></td><td><code>llm_judgment</code></td></tr>
-    <tr><td><code>provenance_tier</code></td><td><code>4</code></td></tr>
-    <tr><td><code>review_status</code></td><td><code>provisional</code></td></tr>
-  </table>
-</section>
-
-<section>
-  <h2>Review workbook</h2>
-  <p>
-    The reviewer workbook should present candidate rows in a form that experts can check efficiently.
-    It should preserve the original sentence, the sampled lemma, Pass 1, Pass 2 and Pass 3 decisions, confidence values, rationales and review flags.
-  </p>
-
-  <table>
-    <tr><th>Reviewer column</th><th>Purpose</th></tr>
-    <tr><td><code>expert_decision</code></td><td>Accept, change, uncertain, or reject.</td></tr>
-    <tr><td><code>expert_function_id</code></td><td>Corrected function ID where needed.</td></tr>
-    <tr><td><code>expert_comment</code></td><td>Reason for change or uncertainty.</td></tr>
-    <tr><td><code>adjudication_required</code></td><td>Marks cases needing a final human decision.</td></tr>
-  </table>
-</section>
-
-<section>
-  <h2>Output folders</h2>
-  <table>
-    <tr><th>Output</th><th>Folder</th></tr>
-    <tr><td>QA reports</td><td><code>Drive/data/outputs/{lang}/qa/</code></td></tr>
-    <tr><td>Review workbooks</td><td><code>Drive/data/outputs/{lang}/review_workbooks/</code></td></tr>
-    <tr><td>Final exports</td><td><code>Drive/exports/</code></td></tr>
-    <tr><td>Review logs</td><td><code>Drive/review/</code></td></tr>
-  </table>
-</section>
-
-<section>
-  <h2>Checks and risks</h2>
-  <ul>
-    <li>Do not describe the dataset as validated until expert review and validation are complete.</li>
-    <li>Keep LLM-generated assignments marked as <code>llm_judgment</code> and <code>provenance_tier = 4</code>.</li>
-    <li>Keep ambiguous rows visible rather than smoothing them away.</li>
-    <li>Preserve disagreements between passes for audit.</li>
-    <li>Reviewer comments should be retained as part of the project record.</li>
-  </ul>
-</section>
-
-<section>
-  <p><a class="button" href="workflow.html">← Back to workflow overview</a></p>
-</section>
-
-</main>
-
-
-<footer>
-  <div>
-    <strong>ALTE Common Corpus SIG</strong><br>
-    European CEFR Vocabulary Atlas pilot support workflow.<br>
-    <a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG">Project repository on GitHub</a> · <a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG/issues">Questions and feedback</a> · Last updated 09 June 2026.
-  </div>
-</footer>
-
-
-</body>
-</html>
+<html lang="en"><head><meta charset="utf-8"><title>Stage 5: QA and expert review | ALTE Common Corpus SIG</title><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="style.css"></head><body><a class="skip-link" href="#main-content">Skip to main content</a><header><div class="header-inner"><p class="eyebrow">ALTE Common Corpus SIG · European CEFR Vocabulary Atlas pilot</p><h1>Stage 5: QA and expert review</h1><p>Automated checks, reviewer preparation and later human review.</p></div></header><nav aria-label="Primary navigation"><div class="nav-inner">
+      <a href="index.html">Start here</a>
+      <a href="rationale-and-use-cases.html">Project overview</a>
+      <a href="current-status.html">Current status</a>
+      <a href="data-and-access.html">Data and access</a>
+      <a href="workflow.html">Workflow</a>
+      <a href="reviewer-area.html">Reviewer guidance</a>
+      <a href="technical-setup.html">Technical guidance</a>
+      <a href="methodology.html">Methodology</a>
+      <a href="governance-and-validation.html">Governance and validation</a>
+      <a href="outputs-and-releases.html">Outputs and releases</a>
+      <a href="faq.html">FAQ</a>
+      <a href="contact-and-support.html">Contact and support</a>
+  </div></nav><main id="main-content">
+<section class="warning"><strong>Provisional candidate material — not validated CEFR data.</strong><br>Current automated outputs are model-generated candidate material for expert review. They are not validated CEFR vocabulary data, not approved Atlas releases, and must not be cited as validated findings.</section><section><h2>Status</h2><p><span class="label partial">Partially implemented</span> QA schemas/templates are public. Expert review, reviewer submission, human adjudication and validation are not publicly evidenced as complete.</p><p><span class="decision">PROJECT-LEAD DECISION REQUIRED</span>: reviewer-workbook location, submission process and adjudication authority.</p></section>
+</main><footer><div><strong>ALTE Common Corpus SIG</strong><br>Public website for the European CEFR Vocabulary Atlas pilot support workflow.<br><a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG">Repository</a> · <a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG/issues">Report an issue</a><br>Last updated: 10 July 2026. Source branch: <code>website/one-stop-shop-revision</code>. Build commit: <span class="decision">PROJECT-LEAD DECISION REQUIRED</span> / technical action: configure GitHub Pages to expose the deployed commit SHA.</div></footer></body></html>

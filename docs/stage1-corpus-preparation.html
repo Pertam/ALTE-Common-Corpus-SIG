@@ -1,121 +1,17 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Stage 1: Corpus Preparation | ALTE Common Corpus SIG</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-
-<header>
-  <div class="header-inner">
-    <h1>Stage 1: Corpus Preparation</h1>
-    <p>Collect, organise and document raw corpus material before any linguistic processing takes place.</p>
-  </div>
-</header>
-
-
-<nav>
-  <div class="nav-inner">
-    <a href="index.html">Home</a>
-    <a href="rationale-and-use-cases.html">Rationale</a>
-    <a href="workflow.html">Workflow</a>
-    <a href="technical-setup.html">Technical setup</a>
-    <a href="reviewer-area.html">Reviewer area</a>
-    <a href="methodology.html">Methodology</a>
-    <a href="faq.html">FAQ</a>
-    <a href="further-reading.html">Further reading</a>
-  </div>
-</nav>
-
-
-<main>
-
-<section class="warning">
-  <strong>Purpose:</strong> Stage 1 prepares the raw corpus material. It does not produce CEFR labels.
-</section>
-
-<section>
-  <h2>What happens in this stage?</h2>
-  <p>
-    Raw corpus files are collected, checked, documented and placed into the agreed Google Drive folder structure.
-    This stage ensures that later processing steps know where each text came from, what language it belongs to, and what restrictions apply to its use.
-  </p>
-</section>
-
-<section>
-  <h2>Inputs</h2>
-  <table>
-    <tr><th>Input</th><th>Description</th><th>Stored where?</th></tr>
-    <tr>
-      <td>Raw corpus files</td>
-      <td>Original text files or corpus exports for English, French, Spanish, German and Czech.</td>
-      <td><code>Drive/data/raw/{lang}/corpus_original/</code></td>
-    </tr>
-    <tr>
-      <td>Metadata</td>
-      <td>Information about source, language, date, register, corpus origin and processing notes.</td>
-      <td><code>Drive/data/raw/{lang}/metadata/</code></td>
-    </tr>
-    <tr>
-      <td>Licensing notes</td>
-      <td>Notes on what can and cannot be redistributed.</td>
-      <td><code>Drive/data/raw/{lang}/licensing/</code></td>
-    </tr>
-  </table>
-</section>
-
-<section>
-  <h2>Example</h2>
-  <table>
-    <tr><th>Field</th><th>Example value</th></tr>
-    <tr><td><code>language</code></td><td><code>en</code></td></tr>
-    <tr><td><code>source_file</code></td><td><code>en_news_2024_part001.txt</code></td></tr>
-    <tr><td><code>sentence</code></td><td><em>Could you send me the report by Friday?</em></td></tr>
-    <tr><td><code>sentence_id</code></td><td><code>en_00018452</code></td></tr>
-    <tr><td><code>register</code></td><td><code>web_or_news</code></td></tr>
-  </table>
-</section>
-
-<section>
-  <h2>Outputs</h2>
-  <p>
-    The output is not a final dataset. The main output is a clean, documented corpus folder ready for processing.
-  </p>
-  <ul>
-    <li>Raw corpus files placed in the correct language folders.</li>
-    <li>Metadata and licensing notes recorded.</li>
-    <li>Source-level documentation sufficient for later audit.</li>
-  </ul>
-</section>
-
-<section>
-  <h2>Checks and risks</h2>
-  <ul>
-    <li>Do not put large raw corpus files in GitHub.</li>
-    <li>Do not put restricted or licensed data in a public repo.</li>
-    <li>Check that each language uses the agreed folder naming convention.</li>
-    <li>Keep metadata even when it feels boring; it becomes important later for validation.</li>
-  </ul>
-</section>
-
-<section>
-  <p><a class="button" href="workflow.html">← Back to workflow overview</a></p>
-</section>
-
-</main>
-
-
-<footer>
-  <div>
-    <strong>ALTE Common Corpus SIG</strong><br>
-    European CEFR Vocabulary Atlas pilot support workflow.<br>
-    <a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG">Project repository on GitHub</a> · <a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG/issues">Questions and feedback</a> · Last updated 09 June 2026.
-  </div>
-</footer>
-
-
-</body>
-</html>
+<html lang="en"><head><meta charset="utf-8"><title>Stage 1: Corpus preparation | ALTE Common Corpus SIG</title><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="style.css"></head><body><a class="skip-link" href="#main-content">Skip to main content</a><header><div class="header-inner"><p class="eyebrow">ALTE Common Corpus SIG · European CEFR Vocabulary Atlas pilot</p><h1>Stage 1: Corpus preparation</h1><p>Preparing corpus inputs for later processing.</p></div></header><nav aria-label="Primary navigation"><div class="nav-inner">
+      <a href="index.html">Start here</a>
+      <a href="rationale-and-use-cases.html">Project overview</a>
+      <a href="current-status.html">Current status</a>
+      <a href="data-and-access.html">Data and access</a>
+      <a href="workflow.html">Workflow</a>
+      <a href="reviewer-area.html">Reviewer guidance</a>
+      <a href="technical-setup.html">Technical guidance</a>
+      <a href="methodology.html">Methodology</a>
+      <a href="governance-and-validation.html">Governance and validation</a>
+      <a href="outputs-and-releases.html">Outputs and releases</a>
+      <a href="faq.html">FAQ</a>
+      <a href="contact-and-support.html">Contact and support</a>
+  </div></nav><main id="main-content">
+<section class="warning"><strong>Provisional candidate material — not validated CEFR data.</strong><br>Current automated outputs are model-generated candidate material for expert review. They are not validated CEFR vocabulary data, not approved Atlas releases, and must not be cited as validated findings.</section><section><h2>Status</h2><p><span class="label partial">Partially implemented</span> Public templates and preparation scripts exist. Corpus-source licensing, language-by-language readiness and Drive locations require confirmation.</p><p><span class="decision">PROJECT-LEAD DECISION REQUIRED</span>: confirmed corpus source inventory, licences and restricted storage map.</p></section>
+</main><footer><div><strong>ALTE Common Corpus SIG</strong><br>Public website for the European CEFR Vocabulary Atlas pilot support workflow.<br><a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG">Repository</a> · <a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG/issues">Report an issue</a><br>Last updated: 10 July 2026. Source branch: <code>website/one-stop-shop-revision</code>. Build commit: <span class="decision">PROJECT-LEAD DECISION REQUIRED</span> / technical action: configure GitHub Pages to expose the deployed commit SHA.</div></footer></body></html>

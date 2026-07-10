@@ -1,73 +1,20 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>GitHub, Colab and Drive | ALTE Common Corpus SIG</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-<header>
-  <div class="header-inner">
-    <h1>GitHub, Colab and Drive</h1>
-    <p>How the reproducible workflow is organised.</p>
-  </div>
-</header>
-
-
-<nav>
-  <div class="nav-inner">
-    <a href="index.html">Home</a>
-    <a href="rationale-and-use-cases.html">Rationale</a>
-    <a href="workflow.html">Workflow</a>
-    <a href="technical-setup.html">Technical setup</a>
-    <a href="reviewer-area.html">Reviewer area</a>
-    <a href="methodology.html">Methodology</a>
-    <a href="faq.html">FAQ</a>
-    <a href="further-reading.html">Further reading</a>
-  </div>
-</nav>
-
-
-<main>
-
-<section>
-  <h2>Technical architecture</h2>
-  <table>
-    <tr><th>Tool</th><th>Role</th></tr>
-    <tr><td>GitHub</td><td>Code, taxonomy, configuration, notebooks, small samples and documentation. Prompt instructions are embedded in the tagging scripts.</td></tr>
-    <tr><td>Google Drive</td><td>Raw corpora, interim files, outputs, review workbooks and logs.</td></tr>
-    <tr><td>Google Colab</td><td>Execution environment that clones GitHub, mounts Drive and runs scripts.</td></tr>
-    <tr><td>OpenAI API</td><td>LLM engine for Pass 1 first-pass tagging, Pass 2 blind validation and Pass 3 adjudication.</td></tr>
-    <tr><td>NotebookLM</td><td>Explainer and reviewer-support layer grounded in project sources.</td></tr>
-  </table>
-</section>
-
-<section>
-  <h2>Recommended Colab sequence</h2>
-  <ol>
-    <li>Clone the GitHub repository.</li>
-    <li>Mount Google Drive.</li>
-    <li>Define <code>REPO_ROOT</code> and <code>DRIVE_ROOT</code>.</li>
-    <li>Install requirements.</li>
-    <li>Validate input paths.</li>
-    <li>Run pipeline scripts.</li>
-    <li>Save outputs back to Drive.</li>
-  </ol>
-</section>
-
-</main>
-
-
-<footer>
-  <div>
-    <strong>ALTE Common Corpus SIG</strong><br>
-    European CEFR Vocabulary Atlas pilot support workflow.<br>
-    <a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG">Project repository on GitHub</a> · <a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG/issues">Questions and feedback</a> · Last updated 09 June 2026.
-  </div>
-</footer>
-
-
-</body>
-</html>
+<html lang="en"><head><meta charset="utf-8"><title>Technical guidance | ALTE Common Corpus SIG</title><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="style.css"></head><body><a class="skip-link" href="#main-content">Skip to main content</a><header><div class="header-inner"><p class="eyebrow">ALTE Common Corpus SIG · European CEFR Vocabulary Atlas pilot</p><h1>Technical guidance</h1><p>Where technical contributors should begin and what is currently verifiable.</p></div></header><nav aria-label="Primary navigation"><div class="nav-inner">
+      <a href="index.html">Start here</a>
+      <a href="rationale-and-use-cases.html">Project overview</a>
+      <a href="current-status.html">Current status</a>
+      <a href="data-and-access.html">Data and access</a>
+      <a href="workflow.html">Workflow</a>
+      <a href="reviewer-area.html">Reviewer guidance</a>
+      <a href="technical-setup.html" aria-current="page" class="active">Technical guidance</a>
+      <a href="methodology.html">Methodology</a>
+      <a href="governance-and-validation.html">Governance and validation</a>
+      <a href="outputs-and-releases.html">Outputs and releases</a>
+      <a href="faq.html">FAQ</a>
+      <a href="contact-and-support.html">Contact and support</a>
+  </div></nav><main id="main-content">
+<section class="warning"><strong>Provisional candidate material — not validated CEFR data.</strong><br>Current automated outputs are model-generated candidate material for expert review. They are not validated CEFR vocabulary data, not approved Atlas releases, and must not be cited as validated findings.</section><section><h2>Repository starting points</h2><table><tr><th>Area</th><th>Current path</th></tr><tr><td>Scripts</td><td><code>scripts/00_validate_inputs.py</code> through <code>scripts/06_make_final_dataset.py</code></td></tr><tr><td>Taxonomy</td><td><code>taxonomy/cefr_function_taxonomy_v0_2.csv</code></td></tr><tr><td>Configuration</td><td><code>config/</code></td></tr><tr><td>Colab runner</td><td><code>notebooks/00_main_project_runner_colab.ipynb</code></td></tr></table></section><section><h2>Current script sequence</h2><pre><code>python scripts/05a_run_pass1.py ...
+python scripts/05b_run_pass2.py ...
+python scripts/05c_run_pass3.py ...
+python scripts/06_make_final_dataset.py ...</code></pre><p>No fictional public command is provided because full runnable inputs may be restricted.</p></section>
+</main><footer><div><strong>ALTE Common Corpus SIG</strong><br>Public website for the European CEFR Vocabulary Atlas pilot support workflow.<br><a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG">Repository</a> · <a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG/issues">Report an issue</a><br>Last updated: 10 July 2026. Source branch: <code>website/one-stop-shop-revision</code>. Build commit: <span class="decision">PROJECT-LEAD DECISION REQUIRED</span> / technical action: configure GitHub Pages to expose the deployed commit SHA.</div></footer></body></html>
