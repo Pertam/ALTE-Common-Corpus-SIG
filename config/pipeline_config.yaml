@@ -2,18 +2,40 @@ project_name: ALTE Common Corpus SIG
 drive_root: /content/drive/MyDrive/ALTE-Common-Corpus-SIG
 
 sampling:
-  content_pos:
-    - NOUN
-    - VERB
-    - ADJ
-    - ADV
+  content_pos: [NOUN, VERB, ADJ, ADV]
   min_arf_per_million: 50
   sample_lemmas_per_language: 15
-  random_seed: 42
+  sentences_per_lemma: 50
+  random_seed: 20260603
 
-llm:
+sense_tagging:
+  inventory_version: v1
+  inventory_status_required: approved
+  add_other: true
+  add_unclear: true
   pass1_model: gpt-5.4-mini
   pass2_model: gpt-5.4-mini
   pass3_model: gpt-5.5
-  provenance_tier: 4
+  pass2_mode: informed_review
+  pass2_sees_pass1_sense: true
+  pass2_sees_pass1_function: true
+
+function_tagging:
+  taxonomy: taxonomy/cefr_function_taxonomy_v0_2.csv
+  pass1_model: gpt-5.4-mini
+  pass2_model: gpt-5.4-mini
+  pass3_model: gpt-5.5
+  pass2_mode: informed_review
+  pass2_sees_pass1_function: true
+  pass2_sees_pass1_sense: true
+
+validation:
+  blind_pass2_enabled: true
+  blind_sample_fraction: 0.15
+  blind_outputs_separate: true
+  compare_with_human_decisions: true
+
+provenance:
+  llm_provenance_tier: 4
   review_status_default: provisional
+  human_inventory_approval_required: true

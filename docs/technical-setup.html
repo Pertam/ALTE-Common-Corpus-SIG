@@ -1,73 +1,18 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>GitHub, Colab and Drive | ALTE Common Corpus SIG</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
-</head>
+<head><meta charset="utf-8"><title>GitHub, Colab and Drive | ALTE Common Corpus SIG</title><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="style.css"></head>
 <body>
-
-<header>
-  <div class="header-inner">
-    <h1>GitHub, Colab and Drive</h1>
-    <p>How the reproducible workflow is organised.</p>
-  </div>
-</header>
-
-
-<nav>
-  <div class="nav-inner">
-    <a href="index.html">Home</a>
-    <a href="rationale-and-use-cases.html">Rationale</a>
-    <a href="workflow.html">Workflow</a>
-    <a href="technical-setup.html">Technical setup</a>
-    <a href="reviewer-area.html">Reviewer area</a>
-    <a href="methodology.html">Methodology</a>
-    <a href="faq.html">FAQ</a>
-    <a href="further-reading.html">Further reading</a>
-  </div>
-</nav>
-
-
+<header><div class="header-inner"><h1>GitHub, Colab and Drive</h1><p>How the reproducible sense-and-function workflow is organised.</p></div></header>
+<nav><div class="nav-inner"><a href="index.html">Home</a><a href="rationale-and-use-cases.html">Rationale</a><a href="workflow.html">Workflow</a><a href="technical-setup.html">Technical setup</a><a href="reviewer-area.html">Reviewer area</a><a href="methodology.html">Methodology</a><a href="faq.html">FAQ</a><a href="further-reading.html">Further reading</a></div></nav>
 <main>
-
-<section>
-  <h2>Technical architecture</h2>
-  <table>
-    <tr><th>Tool</th><th>Role</th></tr>
-    <tr><td>GitHub</td><td>Code, taxonomy, configuration, notebooks, small samples and documentation. Prompt instructions are embedded in the tagging scripts.</td></tr>
-    <tr><td>Google Drive</td><td>Raw corpora, interim files, outputs, review workbooks and logs.</td></tr>
-    <tr><td>Google Colab</td><td>Execution environment that clones GitHub, mounts Drive and runs scripts.</td></tr>
-    <tr><td>OpenAI API</td><td>LLM engine for Pass 1 first-pass tagging, Pass 2 blind validation and Pass 3 adjudication.</td></tr>
-    <tr><td>NotebookLM</td><td>Explainer and reviewer-support layer grounded in project sources.</td></tr>
-  </table>
-</section>
-
-<section>
-  <h2>Recommended Colab sequence</h2>
-  <ol>
-    <li>Clone the GitHub repository.</li>
-    <li>Mount Google Drive.</li>
-    <li>Define <code>REPO_ROOT</code> and <code>DRIVE_ROOT</code>.</li>
-    <li>Install requirements.</li>
-    <li>Validate input paths.</li>
-    <li>Run pipeline scripts.</li>
-    <li>Save outputs back to Drive.</li>
-  </ol>
-</section>
-
+<section><h2>What lives where</h2><table><tr><th>Location</th><th>Contents</th></tr><tr><td>GitHub</td><td>Scripts, configuration, taxonomies, templates, prompts, documentation and small examples.</td></tr><tr><td>Google Drive or institutional storage</td><td>Raw corpora, processed data, Pass 1 outputs, informed Pass 2 outputs, blind-validation outputs, adjudication files, logs and review workbooks.</td></tr><tr><td>Colab or local Python</td><td>Execution environment for the reproducible pipeline.</td></tr></table></section>
+<section><h2>Pass 2 inputs</h2><p>The production Pass 2 scripts require both Pass 1 annotation files:</p><ul><li>Sense Pass 2 reads Sense Pass 1 and Function Pass 1.</li><li>Function Pass 2 reads Function Pass 1 and Sense Pass 1.</li></ul><p>This enables informed critical review. The <code>--blind</code> option hides both Pass 1 outputs for a separate validation sample.</p></section>
+<section><h2>Keep blind and informed outputs separate</h2><pre><code>outputs/en/sense_pass2_informed.csv
+outputs/en/function_pass2_informed.csv
+outputs/en/sense_pass2_blind.csv
+outputs/en/function_pass2_blind.csv</code></pre><p>Do not append blind and informed rows to the same CSV, because the review condition is part of the provenance.</p></section>
+<section><h2>Required identifiers</h2><p>All files must preserve the stable <code>row_id</code>. This is what allows sampled sentences, sense annotations, function annotations and human review decisions to be joined safely.</p></section>
+<section><h2>Secrets and large data</h2><p>API keys and large corpus files must not be committed to GitHub. Keep secrets in environment variables or protected storage and preserve corpus licensing conditions.</p></section>
 </main>
-
-
-<footer>
-  <div>
-    <strong>ALTE Common Corpus SIG</strong><br>
-    European CEFR Vocabulary Atlas pilot support workflow.<br>
-    <a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG">Project repository on GitHub</a> · <a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG/issues">Questions and feedback</a> · Last updated 09 June 2026.
-  </div>
-</footer>
-
-
-</body>
-</html>
+<footer><div><strong>ALTE Common Corpus SIG</strong><br>Last updated 11 July 2026.</div></footer>
+</body></html>

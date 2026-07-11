@@ -6,16 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-
 <header>
   <div class="header-inner">
     <h1>ALTE Common Corpus SIG</h1>
-    <p>Supporting the development of the European CEFR Vocabulary Atlas: a cross-linguistic, sense-level and function-aware vocabulary research workflow.</p>
+    <p>A multilingual, sense-aware and function-aware workflow supporting the European CEFR Vocabulary Atlas pilot.</p>
   </div>
 </header>
-
 <nav>
   <div class="nav-inner">
     <a href="index.html">Home</a>
@@ -28,155 +25,111 @@
     <a href="further-reading.html">Further reading</a>
   </div>
 </nav>
-
 <main>
-
-<div class="notice">
-  <strong>Pilot material — not validated CEFR data.</strong>
-  This project is methodological and exploratory. All LLM-generated outputs are
-  provisional Tier&nbsp;4 candidate material awaiting expert review and corpus validation.
-</div>
-
-<section>
-  <h2>Project overview</h2>
-
-  <p>This site documents the working infrastructure behind the ALTE Common Corpus SIG's contribution to the European CEFR Vocabulary Atlas pilot. The project tests how corpus evidence, CEFR-derived communicative functions, multilingual vocabulary alignment, LLM-assisted classification and expert review can be combined into one transparent workflow.</p>
-
-  <p>The goal is to move beyond flat word lists toward a richer model of vocabulary &mdash; one that captures concepts, senses, language-specific forms, corpus examples and communicative uses.</p>
-</section>
-
-<section>
-  <h2>Start here</h2>
-
-  <div class="card-grid">
-
-    <a class="card card-link" href="rationale-and-use-cases.html">
-      <h3>Why this project matters</h3>
-      <p>
-        Read the rationale for the project and see how the data could support learning, teaching, assessment, classification, research and policy.
-      </p>
-      <span class="read-more">Open rationale →</span>
-    </a>
-
-    <a class="card card-link" href="workflow.html">
-      <h3>How the workflow works</h3>
-      <p>
-        See the five-stage workflow from corpus preparation to function tagging, QA and expert review, including a worked example that follows one sentence through every stage.
-      </p>
-      <span class="read-more">Open workflow →</span>
-    </a>
-
-    <a class="card card-link" href="methodology.html">
-      <h3>Methodological principles</h3>
-      <p>
-        Review the project principles: concept-level analysis, sense distinction, receptive/productive separation and cross-linguistic comparison.
-      </p>
-      <span class="read-more">Open methodology →</span>
-    </a>
-
+  <div class="notice">
+    <strong>Pilot material — not validated CEFR data.</strong>
+    All AI-assisted outputs are provisional Tier 4 candidate material requiring expert review.
   </div>
-</section>
 
-<section>
-  <h2>Project infrastructure</h2>
+  <section>
+    <h2>Project overview</h2>
+    <p>The pilot tests how corpus evidence, lexical senses, language-specific forms, sentence-level communicative functions and expert judgement can be combined across English, French, Spanish, German and Czech.</p>
+    <p>The fundamental data unit is <strong>one target lemma occurrence in one sentence</strong>. Each row receives two distinct annotations: the sense of the target lemma and the communicative function of the whole sentence.</p>
+  </section>
 
-  <p>
-    The project uses GitHub for public project structure and code, Google Drive for larger working data and outputs, and Colab for running the reproducible workflow.
-  </p>
+  <section>
+    <h2>Sense and function are different</h2>
+    <table>
+      <tr><th>Sentence</th><th>Target</th><th>Lexical sense</th><th>Sentence function</th></tr>
+      <tr><td><em>Apply the cream twice daily.</em></td><td><code>apply</code></td><td>put a substance onto a surface</td><td>giving an instruction</td></tr>
+      <tr><td><em>The rule applies to all applicants.</em></td><td><code>apply</code></td><td>be relevant or valid</td><td>stating a rule or condition</td></tr>
+    </table>
+    <p>Sense belongs to the target lemma; function belongs to the sentence. Pass 1 produces them separately. Pass 2 then performs an informed critical review of both, while still recording a separate final decision for sense and function.</p>
+  </section>
 
-  <div class="card-grid">
+  <section>
+    <h2>How the annotation passes work</h2>
+    <table>
+      <tr><th>Pass</th><th>Purpose</th><th>Information available</th></tr>
+      <tr><td>Pass 1</td><td>Produce initial sense and function proposals</td><td>Sentence, target lemma, approved sense inventory and function taxonomy</td></tr>
+      <tr><td>Pass 2</td><td>Critically review, accept, change or flag the initial proposals</td><td>Pass 1 sense, Pass 1 function and both rationales</td></tr>
+      <tr><td>Blind validation sample</td><td>Estimate reliability and possible anchoring</td><td>Original inputs only; Pass 1 is hidden</td></tr>
+      <tr><td>Adjudication and expert review</td><td>Resolve selected difficult or changed cases</td><td>Full annotation evidence and review history</td></tr>
+    </table>
+  </section>
 
-    <div class="card">
-      <h3>GitHub</h3>
-      <p>
-        Code, scripts, notebooks, taxonomy files, configuration, documentation and the GitHub Pages site. Prompt instructions are version-controlled inside the tagging scripts.
-      </p>
-      <a class="button" href="https://github.com/Pertam/ALTE-Common-Corpus-SIG">Open GitHub</a>
+  <section>
+    <h2>The six-stage workflow</h2>
+    <p>Select any stage to see its purpose, inputs, outputs and methodological safeguards.</p>
+    <div class="card-grid">
+      <a class="card card-link" href="stage1-corpus-preparation.html">
+        <h3>Stage 1: Corpus preparation</h3>
+        <p>Document corpus source, licence, language, date, register and file structure.</p>
+        <span class="read-more">Open Stage 1 →</span>
+      </a>
+      <a class="card card-link" href="stage2-processing.html">
+        <h3>Stage 2: Processing and lemma statistics</h3>
+        <p>Tokenise, POS-tag, lemmatise and calculate frequency and dispersion evidence.</p>
+        <span class="read-more">Open Stage 2 →</span>
+      </a>
+      <a class="card card-link" href="stage3-sampling.html">
+        <h3>Stage 3: Target-occurrence sampling</h3>
+        <p>Select eligible lemmas and create stable sentence rows for each target occurrence.</p>
+        <span class="read-more">Open Stage 3 →</span>
+      </a>
+      <a class="card card-link" href="stage4-sense-tagging.html">
+        <h3>Stage 4: Lexical-sense tagging</h3>
+        <p>Create human-approved sense inventories, produce an initial sense proposal and run informed review.</p>
+        <span class="read-more">Open Stage 4 →</span>
+      </a>
+      <a class="card card-link" href="stage5-function-tagging.html">
+        <h3>Stage 5: Communicative-function tagging</h3>
+        <p>Produce an initial sentence-function proposal and run informed taxonomy-based review.</p>
+        <span class="read-more">Open Stage 5 →</span>
+      </a>
+      <a class="card card-link" href="stage6-qa-review.html">
+        <h3>Stage 6: Combined QA and expert review</h3>
+        <p>Adjudicate selected cases, preserve separate decisions and aggregate by sense.</p>
+        <span class="read-more">Open Stage 6 →</span>
+      </a>
     </div>
+    <p><a class="button" href="workflow.html">View the complete workflow overview</a></p>
+  </section>
 
-    <div class="card">
-      <h3>Google Drive</h3>
-      <p>
-        Raw data, interim files, LLM outputs, QA reports, review workbooks, logs and export files.
-      </p>
-      <a class="button" href="https://drive.google.com/drive/folders/1w1kzdFLY1yn5vJ2xIOYJjVqYCf1JFv8t">Open Drive</a>
+  <section>
+    <h2>Project guidance</h2>
+    <div class="card-grid">
+      <a class="card card-link" href="rationale-and-use-cases.html">
+        <h3>Why this project matters</h3>
+        <p>The research gap and possible uses of sense-specific functional profiles.</p>
+        <span class="read-more">Open rationale →</span>
+      </a>
+      <a class="card card-link" href="methodology.html">
+        <h3>Methodological principles</h3>
+        <p>Sense granularity, informed review, validation and multilingual alignment.</p>
+        <span class="read-more">Open methodology →</span>
+      </a>
+      <a class="card card-link" href="reviewer-area.html">
+        <h3>Reviewer area</h3>
+        <p>Guidance for reviewing provisional sense and communicative-function annotations.</p>
+        <span class="read-more">Open reviewer area →</span>
+      </a>
     </div>
+  </section>
 
-    <div class="card">
-      <h3>Colab</h3>
-      <p>
-        Main execution environment for cloning GitHub, mounting Drive, checking paths and running the pipeline scripts.
-      </p>
-      <a class="button" href="https://colab.research.google.com/github/Pertam/ALTE-Common-Corpus-SIG/blob/main/notebooks/00_main_project_runner_colab.ipynb">Open Colab</a>
-    </div>
-
-  </div>
-</section>
-
-<section>
-  <h2>Who the site is for</h2>
-
-  <table>
-    <tr>
-      <th>User group</th>
-      <th>Most useful pages</th>
-    </tr>
-
-    <tr>
-      <td>SIG members and project readers</td>
-      <td>
-        <a href="rationale-and-use-cases.html">Rationale</a>,
-        <a href="workflow.html">Workflow</a>,
-        <a href="methodology.html">Methodology</a>
-      </td>
-    </tr>
-
-    <tr>
-      <td>Technical contributors</td>
-      <td>
-        <a href="technical-setup.html">Technical setup</a>,
-        <a href="workflow.html">Workflow</a>,
-        <a href="further-reading.html">Further reading</a>
-      </td>
-    </tr>
-
-    <tr>
-      <td>Reviewers</td>
-      <td>
-        <a href="reviewer-area.html">Reviewer area</a>,
-        <a href="methodology.html">Methodology</a>,
-        <a href="stage5-qa-review.html">QA and expert review</a>
-      </td>
-    </tr>
-
-    <tr>
-      <td>Assessment, curriculum and policy readers</td>
-      <td>
-        <a href="rationale-and-use-cases.html">Rationale</a>,
-        <a href="methodology.html">Methodology</a>,
-        <a href="workflow.html">Workflow</a>
-      </td>
-    </tr>
-  </table>
-</section>
-
-<section>
-  <h2>Current project focus</h2>
-
-  <p>The pilot covers five languages &mdash; English, French, Spanish, German and Czech &mdash; linking corpus-derived lemma evidence to sentence-level function tagging, then preparing the output for review and later validation.</p>
-
-  <p>Throughout, the emphasis is on preserving cross-linguistic differences rather than forcing equivalent-looking words into the same level or category.</p>
-</section>
-
+  <section>
+    <h2>Join the pilot</h2>
+    <p>Prospective participants can contribute language expertise, sense-inventory review, taxonomy review, validation, cross-language alignment, corpus methodology or technical development.</p>
+  </section>
 </main>
-
 <footer>
   <div>
     <strong>ALTE Common Corpus SIG</strong><br>
     European CEFR Vocabulary Atlas pilot support workflow.<br>
-    <a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG">Project repository on GitHub</a> · <a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG/issues">Questions and feedback</a> · Last updated 09 June 2026.
+    <a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG">Project repository on GitHub</a> ·
+    <a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG/issues">Questions and feedback</a> ·
+    Last updated 11 July 2026.
   </div>
 </footer>
-
 </body>
 </html>

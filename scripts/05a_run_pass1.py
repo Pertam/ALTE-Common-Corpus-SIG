@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Stage 05a: LLM Pass 1 sentence-level function tagging.
+"""Stage 05a: first independent sentence-level communicative-function annotation.
 
-Tags the communicative function of the whole sentence using the controlled
-CEFR-derived taxonomy. Outputs are provisional Tier 4 candidate material only.
+The function label describes what the whole sentence is doing communicatively.
+It is intentionally independent of the target lemma's lexical-sense annotation.
 """
 
 from __future__ import annotations
@@ -25,7 +25,7 @@ from llm_function_tagging_utils import (
     require_columns,
 )
 
-PASS1_FIELDS = [
+FIELDS = [
     "row_id",
     "sentence",
     "top_level_label",
@@ -58,30 +58,28 @@ def schema() -> dict:
             "ambiguity_note": {"type": "string"},
             "requires_review": {"type": "boolean"},
         },
-        PASS1_FIELDS,
+        FIELDS,
     )
 
 
 def annotate(model: str, taxonomy_text: str, row: dict[str, str], hierarchy: dict[str, dict[str, str]]) -> dict:
     instructions = f"""
-You are annotating ONE sentence for the European CEFR Vocabulary Atlas pilot.
+You are the FIRST INDEPENDENT annotator for one sentence-level communicative-function tag.
 
-Task: assign the best sentence-level communicative function from the controlled taxonomy.
-
-Rules:
+RULES
 - Tag what the whole sentence is doing communicatively.
-- Do not tag the topic of the sentence.
-- Do not tag the sampled lemma itself.
-- Use only one function_id from the taxonomy.
-- If uncertain, use confidence = low and requires_review = true.
-- Keep rationale to a maximum of 25 words.
+- Do not tag the sentence topic.
+- Do not tag the sampled lemma or its lexical sense.
+- Use only one function_id from the controlled taxonomy.
+- If uncertain, use confidence=low and requires_review=true.
+- Keep the rationale to 25 words or fewer.
 - If there is no plausible alternative, set alternative_function_id to an empty string.
 - Outputs are provisional Tier 4 candidate material for expert review.
 
-CONTROLLED TAXONOMY:
+CONTROLLED TAXONOMY
 {taxonomy_text}
 
-SENTENCE:
+SENTENCE
 row_id: {row['row_id']}
 sentence: {row['sentence']}
 """
@@ -95,32 +93,38 @@ sentence: {row['sentence']}
 
 def dry_run_result(row: dict[str, str], hierarchy: dict[str, dict[str, str]]) -> dict:
     first_id = next(iter(hierarchy))
-    h = hierarchy[first_id]
+    item = hierarchy[first_id]
     return {
         "row_id": row["row_id"],
         "sentence": row["sentence"],
-        "top_level_label": h["top_level_label"],
-        "subcategory_id": h["subcategory_id"],
-        "subcategory_label": h["subcategory_label"],
+        "top_level_label": item["top_level_label"],
+        "subcategory_id": item["subcategory_id"],
+        "subcategory_label": item["subcategory_label"],
         "function_id": first_id,
-        "function_label": h["function_label"],
+        "function_label": item["function_label"],
         "confidence": "low",
-        "rationale": "Dry run only; not an LLM judgment.",
+        "rationale": "Dry run only; not an LLM judgement.",
         "alternative_function_id": "",
-        "ambiguity_note": "Dry run placeholder for pipeline testing.",
+        "ambiguity_note": "Dry-run placeholder.",
         "requires_review": True,
     }
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run Pass 1 sentence-level function tagging.")
-    parser.add_argument("--sentences", "--input", dest="sentences", required=True, help="Sampled sentence CSV from Stage 04")
+    parser = argparse.ArgumentParser(description="Run independent Function Pass 1.")
+    parser.add_argument(
+        "--sentences",
+        "--input",
+        dest="sentences",
+        required=True,
+        help="Sampled target-occurrence CSV from Stage 03",
+    )
     parser.add_argument("--taxonomy", required=True)
     parser.add_argument("--output", required=True)
     parser.add_argument("--model", default=default_model("pass1"))
-    parser.add_argument("--sleep", type=float, default=0.0, help="Seconds to sleep between API calls")
-    parser.add_argument("--limit", type=int, default=0, help="Optional row limit for testing")
-    parser.add_argument("--dry_run", action="store_true", help="Write structurally valid non-LLM rows for pipeline testing")
+    parser.add_argument("--sleep", type=float, default=0.0)
+    parser.add_argument("--limit", type=int, default=0)
+    parser.add_argument("--dry_run", action="store_true")
     args = parser.parse_args()
 
     records, _, hierarchy = read_taxonomy(Path(args.taxonomy))
@@ -130,25 +134,26 @@ def main() -> None:
     require_columns(data, ["sentence"], "Sentence sample")
     if "row_id" not in data.columns:
         data.insert(0, "row_id", [f"row_{i + 1:06d}" for i in range(len(data))])
-        print("WARNING: input had no row_id column; generated row_000001-style IDs for this run.")
-    if args.limit and args.limit > 0:
+        print("WARNING: input had no row_id; generated row_000001-style IDs.")
+    if args.limit > 0:
         data = data.head(args.limit)
 
     output_path = Path(args.output)
     done = load_done_ids(output_path)
-
-    for _, row in data.iterrows():
-        row_dict = {"row_id": str(row["row_id"]), "sentence": str(row["sentence"])}
-        if row_dict["row_id"] in done:
+    for _, series in data.iterrows():
+        row = {"row_id": str(series["row_id"]), "sentence": str(series["sentence"])}
+        if row["row_id"] in done:
             continue
-        result = dry_run_result(row_dict, hierarchy) if args.dry_run else annotate(args.model, taxonomy_text, row_dict, hierarchy)
-        append_csv_row(output_path, PASS1_FIELDS, result)
-        done.add(row_dict["row_id"])
-        print(f"Pass 1 row {row_dict['row_id']}: {result['function_id']} ({result['confidence']})")
+        result = dry_run_result(row, hierarchy) if args.dry_run else annotate(
+            args.model, taxonomy_text, row, hierarchy
+        )
+        append_csv_row(output_path, FIELDS, result)
+        done.add(row["row_id"])
+        print(f"Function Pass 1 {row['row_id']}: {result['function_id']} ({result['confidence']})")
         if args.sleep:
             time.sleep(args.sleep)
 
-    print(f"Pass 1 complete: {output_path}")
+    print(f"Function Pass 1 complete: {output_path}")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Stage 6: Combined QA and Expert Review</title><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="style.css"></head><body><header><div class="header-inner"><h1>Stage 6: Combined QA and Expert Review</h1><p>Join initial annotations, informed reviews and adjudication while preserving separate sense and function decisions.</p></div></header><nav><div class="nav-inner"><a href="index.html">Home</a><a href="workflow.html">Workflow</a><a href="reviewer-area.html">Reviewer area</a><a href="methodology.html">Methodology</a></div></nav><main>
+<section><h2>Build the combined dataset</h2><pre><code>python scripts/06_make_final_dataset.py \
+ --samples data/en_sampled_occurrences.csv \
+ --sense_pass1 data/en_sense_pass1.csv \
+ --sense_pass2 data/en_sense_pass2.csv \
+ --sense_pass3 data/en_sense_pass3.csv \
+ --function_pass1 data/en_function_pass1.csv \
+ --function_pass2 data/en_function_pass2.csv \
+ --function_pass3 data/en_function_pass3.csv \
+ --output data/en_combined_review.csv</code></pre></section>
+<section><h2>Human review</h2><p>Reviewers may see the initial sense, initial function, informed review decisions and interaction notes in one workbook. They still make two explicit final decisions: one about the target lemma sense and one about the whole-sentence function. A correction to one does not automatically change the other.</p></section>
+<section><h2>Priority cases</h2><ul><li>Pass 2 changes Pass 1.</li><li>Pass 2 marks either annotation uncertain.</li><li>Either annotation has low confidence.</li><li>Sense Pass 2 selects OTHER or UNCLEAR.</li><li>An interaction note reports tension between the proposed sense and function.</li><li>The reviewer suspects a gap in the sense inventory or function taxonomy.</li></ul></section>
+<section><h2>Automated QA</h2><ul><li>Every output maps to one sampled row ID.</li><li>Final sense IDs belong to the approved inventory.</li><li>Final function IDs belong to the controlled taxonomy.</li><li>Pass 2 review mode is recorded as <code>informed_review</code> or <code>blind_validation</code>.</li><li>Blind and informed outputs are stored separately.</li><li>Changes, uncertainty, interaction notes, OTHER and UNCLEAR remain visible.</li><li>Model output is never represented as validated CEFR data.</li></ul></section>
+<section><h2>Validation comparison</h2><p>The pilot should compare informed Pass 2, blind Pass 2 and human decisions. This allows the project to test whether seeing Pass 1 improves final quality and whether it also creates anchoring.</p></section>
+<section><h2>Aggregation</h2><p>After review, function distributions are calculated by:</p><pre><code>language + target_lemma + approved_sense_id</code></pre><p>This creates sense-specific functional environment profiles rather than mixing all meanings of a headword.</p></section>
+<section><h2>Cross-language alignment</h2><p>Reviewed language-specific senses may later be linked to broader concept IDs. Alignment must allow one-to-many and constructional relationships rather than forcing identical inventories.</p></section>
+</main><footer><div><strong>ALTE Common Corpus SIG</strong><br>Last updated 11 July 2026.</div></footer></body></html>
