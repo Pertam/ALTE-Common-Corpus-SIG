@@ -1,4 +1,29 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Stage 4: Lexical-Sense Tagging</title><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="style.css"></head><body><header><div class="header-inner"><h1>Stage 4: Lexical-Sense Tagging</h1><p>Create human-approved lemma-specific inventories and assign each target occurrence independently.</p></div></header><nav><div class="nav-inner"><a href="index.html">Home</a><a href="workflow.html">Workflow</a><a href="reviewer-area.html">Reviewer area</a><a href="methodology.html">Methodology</a></div></nav><main><section class="warning"><strong>Human checkpoint:</strong> provisional inventories must be reviewed and marked approved before production tagging.</section><section><h2>4A: Propose the inventory</h2><pre><code>python scripts/04a_create_sense_inventory.py \
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Stage 4: Lexical-Sense Tagging</title><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="style.css"></head><body><header><div class="header-inner"><h1>Stage 4: Lexical-Sense Tagging</h1><p>Create human-approved lemma-specific inventories, produce an initial sense proposal and run informed critical review.</p></div></header><nav><div class="nav-inner"><a href="index.html">Home</a><a href="workflow.html">Workflow</a><a href="reviewer-area.html">Reviewer area</a><a href="methodology.html">Methodology</a></div></nav><main>
+<section class="warning"><strong>Human checkpoint:</strong> provisional inventories must be reviewed and marked approved before production tagging.</section>
+<section><h2>4A: Propose the inventory</h2><pre><code>python scripts/04a_create_sense_inventory.py \
  --samples data/en_sampled_occurrences.csv \
- --output data/en_sense_inventory.csv</code></pre><p>The proposal records short glosses, distinguishing features, typical patterns and supporting row IDs.</p></section><section><h2>4B: Human approval</h2><p>A language expert may merge, split, rename, add or remove senses. Retain OTHER and UNCLEAR, then set retained rows to <code>inventory_status=approved</code>.</p></section><section><h2>4C: Independent passes</h2><pre><code>python scripts/04b_run_sense_pass1.py --samples data/en_sampled_occurrences.csv --inventory data/en_sense_inventory.csv --output data/en_sense_pass1.csv
-python scripts/04c_run_sense_pass2.py --samples data/en_sampled_occurrences.csv --inventory data/en_sense_inventory.csv --output data/en_sense_pass2.csv</code></pre><p>Pass 2 does not see Pass 1.</p></section><section><h2>4D: Adjudication</h2><pre><code>python scripts/04d_run_sense_adjudication.py --pass1 data/en_sense_pass1.csv --pass2 data/en_sense_pass2.csv --inventory data/en_sense_inventory.csv --only_problem_cases --output data/en_sense_pass3.csv</code></pre><p>The sense classifier answers what the target lemma means, not what the whole sentence is doing.</p></section><section><p><a class="button" href="stage5-function-tagging.html">Continue to Stage 5 →</a></p></section></main><footer><div><strong>ALTE Common Corpus SIG</strong><br>Last updated 11 July 2026.</div></footer></body></html>
+ --output data/en_sense_inventory.csv</code></pre><p>The proposal records short glosses, distinguishing features, typical patterns and supporting row IDs.</p></section>
+<section><h2>4B: Human approval</h2><p>A language expert may merge, split, rename, add or remove senses. Retain OTHER and UNCLEAR, then set retained rows to <code>inventory_status=approved</code>.</p></section>
+<section><h2>4C: Sense Pass 1</h2><pre><code>python scripts/04b_run_sense_pass1.py \
+ --samples data/en_sampled_occurrences.csv \
+ --inventory data/en_sense_inventory.csv \
+ --output data/en_sense_pass1.csv</code></pre><p>Pass 1 selects the most defensible sense from the approved inventory and records confidence, rationale and any plausible alternative.</p></section>
+<section><h2>4D: Informed Sense Pass 2</h2><pre><code>python scripts/04c_run_sense_pass2.py \
+ --samples data/en_sampled_occurrences.csv \
+ --inventory data/en_sense_inventory.csv \
+ --pass1 data/en_sense_pass1.csv \
+ --function_pass1 data/en_function_pass1.csv \
+ --output data/en_sense_pass2.csv</code></pre><p>Pass 2 sees the initial sense, the initial sentence function and both rationales. It accepts, changes or marks the sense uncertain. The function may support interpretation, but it must not determine the lexical sense.</p></section>
+<section><h2>4E: Optional blind validation sample</h2><pre><code>python scripts/04c_run_sense_pass2.py \
+ --samples data/en_blind_sample.csv \
+ --inventory data/en_sense_inventory.csv \
+ --blind \
+ --output data/en_sense_pass2_blind.csv</code></pre><p>Blind output is stored separately and used to study reliability and possible anchoring.</p></section>
+<section><h2>4F: Adjudication</h2><pre><code>python scripts/04d_run_sense_adjudication.py \
+ --pass1 data/en_sense_pass1.csv \
+ --pass2 data/en_sense_pass2.csv \
+ --inventory data/en_sense_inventory.csv \
+ --only_problem_cases \
+ --output data/en_sense_pass3.csv</code></pre><p>Adjudication focuses on changed, uncertain, low-confidence, OTHER, UNCLEAR and likely inventory-problem cases.</p></section>
+<section><p><a class="button" href="stage5-function-tagging.html">Continue to Stage 5 →</a></p></section>
+</main><footer><div><strong>ALTE Common Corpus SIG</strong><br>Last updated 11 July 2026.</div></footer></body></html>
