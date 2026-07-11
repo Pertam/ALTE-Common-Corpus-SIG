@@ -16,14 +16,24 @@ sense_tagging:
   pass1_model: gpt-5.4-mini
   pass2_model: gpt-5.4-mini
   pass3_model: gpt-5.5
-  require_independent_pass2: true
+  pass2_mode: informed_review
+  pass2_sees_pass1_sense: true
+  pass2_sees_pass1_function: true
 
 function_tagging:
   taxonomy: taxonomy/cefr_function_taxonomy_v0_2.csv
   pass1_model: gpt-5.4-mini
   pass2_model: gpt-5.4-mini
   pass3_model: gpt-5.5
-  require_independent_pass2: true
+  pass2_mode: informed_review
+  pass2_sees_pass1_function: true
+  pass2_sees_pass1_sense: true
+
+validation:
+  blind_pass2_enabled: true
+  blind_sample_fraction: 0.15
+  blind_outputs_separate: true
+  compare_with_human_decisions: true
 
 provenance:
   llm_provenance_tier: 4
