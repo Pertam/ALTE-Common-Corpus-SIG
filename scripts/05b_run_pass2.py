@@ -1,143 +1,66 @@
 #!/usr/bin/env python3
-"""Stage 05b: LLM Pass 2 blind validation of Pass 1 function tags."""
-
+"""Stage 05b: second independent sentence-level function annotation."""
 from __future__ import annotations
 
 import argparse
 import time
 from pathlib import Path
-
 import pandas as pd
 
-from llm_function_tagging_utils import (
-    append_csv_row,
-    apply_taxonomy_fields,
-    call_model_json,
-    compact_taxonomy_text,
-    default_model,
-    load_done_ids,
-    make_schema,
-    read_taxonomy,
-    require_columns,
-)
+from llm_function_tagging_utils import append_csv_row, apply_taxonomy_fields, call_model_json, compact_taxonomy_text, default_model, load_done_ids, make_schema, read_taxonomy, require_columns
 
-PASS2_FIELDS = [
-    "row_id",
-    "sentence",
-    "pass1_function_id",
-    "validator_decision",
-    "function_id",
-    "function_label",
-    "confidence",
-    "validation_rationale",
-    "requires_review",
-]
+FIELDS = ["row_id", "sentence", "top_level_label", "subcategory_id", "subcategory_label", "function_id", "function_label", "confidence", "rationale", "alternative_function_id", "ambiguity_note", "requires_review"]
 
 
 def schema() -> dict:
-    return make_schema(
-        "cefr_function_pass2",
-        {
-            "row_id": {"type": "string"},
-            "sentence": {"type": "string"},
-            "pass1_function_id": {"type": "string"},
-            "validator_decision": {"type": "string", "enum": ["accept", "change", "uncertain"]},
-            "function_id": {"type": "string"},
-            "function_label": {"type": "string"},
-            "confidence": {"type": "string", "enum": ["high", "medium", "low"]},
-            "validation_rationale": {"type": "string"},
-            "requires_review": {"type": "boolean"},
-        },
-        PASS2_FIELDS,
-    )
+    return make_schema("cefr_function_pass2_independent", {
+        "row_id":{"type":"string"}, "sentence":{"type":"string"},
+        "top_level_label":{"type":"string"}, "subcategory_id":{"type":"string"}, "subcategory_label":{"type":"string"},
+        "function_id":{"type":"string"}, "function_label":{"type":"string"},
+        "confidence":{"type":"string", "enum":["high","medium","low"]}, "rationale":{"type":"string"},
+        "alternative_function_id":{"type":"string"}, "ambiguity_note":{"type":"string"}, "requires_review":{"type":"boolean"}}, FIELDS)
 
 
-def validate(model: str, taxonomy_text: str, row: dict[str, str], hierarchy: dict[str, dict[str, str]]) -> dict:
-    instructions = f"""
-You are doing blind validation of a provisional sentence-level function tag.
+def annotate(model: str, taxonomy_text: str, row: dict[str, str], hierarchy) -> dict:
+    prompt = f"""
+You are the SECOND INDEPENDENT communicative-function annotator. Make a fresh decision; you have not seen Pass 1.
+Tag what the whole sentence is doing communicatively. Do not tag its topic, sampled lemma or lexical sense.
+Use one function_id from the controlled taxonomy. Use low confidence and requires_review=true when uncertain.
+Keep the rationale under 25 words.
 
-Task: challenge the Pass 1 label and decide whether it is the best available taxonomy label.
-
-Rules:
-- Tag what the whole sentence is doing communicatively.
-- Do not tag the sentence topic.
-- Do not tag the sampled lemma itself.
-- Accept the Pass 1 tag if it is reasonable and defensible.
-- Change it only if another function is clearly better.
-- If genuinely ambiguous, use validator_decision = uncertain and requires_review = true.
-- Use only one function_id from the controlled taxonomy.
-- Keep validation_rationale to a maximum of 30 words.
-- Outputs are provisional Tier 4 candidate material for expert review.
-
-CONTROLLED TAXONOMY:
+TAXONOMY
 {taxonomy_text}
-
-CASE:
+SENTENCE
 row_id: {row['row_id']}
-sentence: {row['sentence']}
-pass1_function_id: {row['function_id']}
-pass1_function_label: {row.get('function_label', '')}
-pass1_rationale: {row.get('rationale', '')}
+{row['sentence']}
 """
-    result = call_model_json(model, instructions, schema())
+    result = call_model_json(model, prompt, schema())
     result = apply_taxonomy_fields(result, "function_id", hierarchy)
+    if result.get("alternative_function_id") not in hierarchy: result["alternative_function_id"] = ""
     return result
 
 
-def dry_run_result(row: dict[str, str], hierarchy: dict[str, dict[str, str]]) -> dict:
-    fid = str(row["function_id"])
-    if fid not in hierarchy:
-        fid = next(iter(hierarchy))
-    h = hierarchy[fid]
-    return {
-        "row_id": row["row_id"],
-        "sentence": row["sentence"],
-        "pass1_function_id": row["function_id"],
-        "validator_decision": "uncertain",
-        "function_id": fid,
-        "function_label": h["function_label"],
-        "confidence": "low",
-        "validation_rationale": "Dry run only; not an LLM validation.",
-        "requires_review": True,
-    }
-
-
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run Pass 2 blind validation.")
-    parser.add_argument("--pass1", required=True)
-    parser.add_argument("--taxonomy", required=True)
-    parser.add_argument("--output", required=True)
-    parser.add_argument("--model", default=default_model("pass2"))
-    parser.add_argument("--sleep", type=float, default=0.0)
-    parser.add_argument("--limit", type=int, default=0)
-    parser.add_argument("--dry_run", action="store_true")
+    parser = argparse.ArgumentParser(description="Run independent Function Pass 2.")
+    parser.add_argument("--sentences", "--input", dest="sentences", required=True)
+    parser.add_argument("--taxonomy", required=True); parser.add_argument("--output", required=True)
+    parser.add_argument("--model", default=default_model("pass2")); parser.add_argument("--limit", type=int, default=0)
+    parser.add_argument("--sleep", type=float, default=0.0); parser.add_argument("--dry_run", action="store_true")
     args = parser.parse_args()
+    records, _, hierarchy = read_taxonomy(Path(args.taxonomy)); taxonomy_text = compact_taxonomy_text(records)
+    data = pd.read_csv(args.sentences, dtype=str).fillna(""); require_columns(data, ["sentence"], "Sentence sample")
+    if "row_id" not in data.columns: data.insert(0, "row_id", [f"row_{i+1:06d}" for i in range(len(data))])
+    if args.limit > 0: data = data.head(args.limit)
+    output = Path(args.output); done = load_done_ids(output)
+    for _, series in data.iterrows():
+        row = {"row_id":str(series["row_id"]), "sentence":str(series["sentence"])}
+        if row["row_id"] in done: continue
+        if args.dry_run:
+            fid = next(iter(hierarchy)); h = hierarchy[fid]
+            result = {"row_id":row["row_id"], "sentence":row["sentence"], "top_level_label":h["top_level_label"], "subcategory_id":h["subcategory_id"], "subcategory_label":h["subcategory_label"], "function_id":fid, "function_label":h["function_label"], "confidence":"low", "rationale":"Dry run only", "alternative_function_id":"", "ambiguity_note":"", "requires_review":True}
+        else: result = annotate(args.model, taxonomy_text, row, hierarchy)
+        append_csv_row(output, FIELDS, result); done.add(row["row_id"])
+        print(f"Function Pass 2 {row['row_id']}: {result['function_id']}")
+        if args.sleep: time.sleep(args.sleep)
 
-    records, _, hierarchy = read_taxonomy(Path(args.taxonomy))
-    taxonomy_text = compact_taxonomy_text(records)
-
-    p1 = pd.read_csv(args.pass1, dtype=str).fillna("")
-    require_columns(p1, ["row_id", "sentence", "function_id", "function_label"], "Pass 1")
-    if args.limit and args.limit > 0:
-        p1 = p1.head(args.limit)
-
-    output_path = Path(args.output)
-    done = load_done_ids(output_path)
-
-    for _, row in p1.iterrows():
-        row_dict = row.to_dict()
-        row_dict["row_id"] = str(row_dict["row_id"])
-        if row_dict["row_id"] in done:
-            continue
-        result = dry_run_result(row_dict, hierarchy) if args.dry_run else validate(args.model, taxonomy_text, row_dict, hierarchy)
-        append_csv_row(output_path, PASS2_FIELDS, result)
-        done.add(row_dict["row_id"])
-        print(f"Pass 2 row {row_dict['row_id']}: {result['validator_decision']} -> {result['function_id']}")
-        if args.sleep:
-            time.sleep(args.sleep)
-
-    print(f"Pass 2 complete: {output_path}")
-
-
-if __name__ == "__main__":
-    main()
+if __name__ == "__main__": main()
