@@ -1,53 +1,19 @@
-# CEFR Vocabulary Atlas Pilot — Stage 1–5 Pipeline Additions
+# CEFR Vocabulary Atlas Pilot — Six-Stage Pipeline
 
-This folder contains the GitHub-ready scripts, configuration and templates needed to make the early corpus stages of the European CEFR Vocabulary Atlas pilot reproducible.
-
-## What this adds
-
-```text
-scripts/
-  00_validate_inputs.py
-  01_prepare_leipzig_sentences.py
-  02_tokenise_lemmatise.py
-  03_compute_lemma_stats.py
-  04_sample_lemmas_and_sentences.py
-  05_run_pass1_function_tagging.py
-  06_run_pass2_blind_validation.py
-  07_build_lemma_function_profiles.py
-  08_quality_checks.py
-  09_export_review_workbook.py
-
-config/
-  project_config.yaml
-
-taxonomy/
-  cefr_function_taxonomy_v0_2.csv
-
-templates/
-  raw_leipzig_sentence_format.txt
-  stage1_sentences_schema.csv
-  tokens_schema.csv
-  lemma_sentence_index_schema.csv
-  lemma_stats_schema.csv
-  stage3_sampled_sentences_schema.csv
-  review_workbook_columns.csv
-  drive_folder_structure.md
-  colab_run_commands.md
-```
+This guide summarises the reproducible workflow for corpus preparation, target-occurrence sampling, lexical-sense tagging, communicative-function tagging and expert review.
 
 ## Stage mapping
 
-| Project stage | Script(s) | Purpose |
+| Project stage | Main scripts | Purpose |
 |---|---|---|
-| Stage 1 | `01_prepare_leipzig_sentences.py` | Normalise raw Leipzig sentence files into stable sentence tables. |
-| Stage 2 | `02_tokenise_lemmatise.py`, `03_compute_lemma_stats.py` | Tokenise, lemmatise, POS-tag and compute frequency/dispersion/ARF-style lemma evidence. |
-| Stage 3 | `04_sample_lemmas_and_sentences.py` | Select eligible lemmas and sample sentences for function tagging. |
-| Stage 4 | `05_run_pass1_function_tagging.py`, `06_run_pass2_blind_validation.py` | LLM-assisted sentence-level function tagging and blind validation. |
-| Stage 5 | `07_build_lemma_function_profiles.py`, `08_quality_checks.py`, `09_export_review_workbook.py` | Aggregate lemma functional profiles, QA and reviewer workbook export. |
+| Stage 1 | `01_prepare_leipzig_sentences.py` | Normalise raw sentence files and preserve source metadata. |
+| Stage 2 | `02_tokenise_lemmatise.py`, `03_compute_lemma_stats.py` | Tokenise, lemmatise, POS-tag and compute frequency and dispersion evidence. |
+| Stage 3 | `04_sample_lemmas_and_sentences.py` | Select eligible lemmas and create stable target-occurrence rows. |
+| Stage 4 | `04a_create_sense_inventory.py`, `04b_run_sense_pass1.py`, `04c_run_sense_pass2.py`, `04d_run_sense_adjudication.py` | Create human-approved sense inventories, initial sense annotations, informed reviews and targeted adjudication. |
+| Stage 5 | `05a_run_pass1.py`, `05b_run_pass2.py`, `05c_run_pass3.py` | Create initial sentence-function annotations, informed reviews and targeted adjudication. |
+| Stage 6 | `06_make_final_dataset.py` and review tools | Combine evidence, preserve provenance and support expert review and sense-level aggregation. |
 
-## Final sampling decision used in the pilot
-
-The final pilot sampling decision was:
+## Pilot sampling decision
 
 ```text
 languages: English, French, Spanish, German, Czech
@@ -58,8 +24,24 @@ sentences per lemma: 50
 random seed: 20260603
 ```
 
-The important methodological change was that we moved away from trying to tag huge batches of 750+ rows directly in chat. Instead, the workflow creates reproducible sample CSVs and then sends rows through the API in resumable batches with explicit validation.
+## Annotation sequence
 
-## Important methodological note
+1. Create and human-approve a language-specific sense inventory for each sampled lemma and POS.
+2. Run Sense Pass 1 and Function Pass 1 as separate initial decisions.
+3. Run informed Sense Pass 2 with access to Pass 1 sense and function.
+4. Run informed Function Pass 2 with access to Pass 1 function and sense.
+5. Adjudicate changed, uncertain, low-confidence and flagged rows.
+6. Merge outputs for expert review while retaining separate final sense and function decisions.
 
-The ARF-style value implemented here is a transparent pilot approximation. It is not claimed as externally validated ARF evidence and is not a CEFR level. It is a reproducible filtering and sampling aid.
+## Blind-validation sample
+
+The Pass 2 scripts support `--blind`. Use this only on a smaller separately sampled subset, with separate output files. Compare blind, informed and human outcomes to estimate reliability and possible anchoring.
+
+## Important methodological notes
+
+- One row represents one target lemma occurrence in one sentence.
+- Sense belongs to the target occurrence; function belongs to the whole sentence.
+- Informed review may use the other annotation as contextual evidence but not as proof.
+- Language-specific senses are developed before cross-language concept alignment.
+- ARF-style values are transparent pilot approximations and are not CEFR levels.
+- All model-generated outputs remain provisional Tier 4 candidate material until expert review and validation.
