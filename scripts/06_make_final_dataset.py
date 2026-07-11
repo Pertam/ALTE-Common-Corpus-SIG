@@ -30,8 +30,8 @@ def merge_family(base, p1, p2, p3, family, id_col, label_col):
     result[f"final_{family}_source"] = "pass2"
     result[f"{family}_human_review_recommended"] = ((result[f"{family}_pass1_{id_col}"] != result[f"{family}_pass2_{id_col}"]) | (result[f"{family}_pass1_confidence"] == "low") | (result[f"{family}_pass2_confidence"] == "low"))
     if p3 is not None and not p3.empty:
-        p3_id, p3_label = f"final_{family}_id", f"final_{family}_{'sense_gloss' if family == 'sense' else 'function_label'}"
-        if p3_label not in p3.columns: p3_label = f"final_{family}_label"
+        p3_id = f"final_{family}_id"
+        p3_label = "final_sense_gloss" if family == "sense" else "final_function_label"
         require(p3, ["row_id", p3_id, p3_label, f"final_{family}_confidence", "human_review_recommended"], f"{family} Pass 3")
         extra = p3[["row_id", p3_id, p3_label, f"final_{family}_confidence", "human_review_recommended"]].rename(columns={p3_id:"_id", p3_label:"_label", f"final_{family}_confidence":"_confidence", "human_review_recommended":"_review"})
         result = result.merge(extra, on="row_id", how="left"); has = result["_id"] != ""
