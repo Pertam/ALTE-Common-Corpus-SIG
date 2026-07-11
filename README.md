@@ -34,7 +34,7 @@ The row carries two distinct annotations:
 
 ### Pass 1: initial annotations
 
-Sense Pass 1 and Function Pass 1 are produced separately. This keeps the basic distinction clear:
+Sense Pass 1 and Function Pass 1 are produced as separate decisions. This keeps the basic distinction clear:
 
 - sense belongs to the target lemma occurrence;
 - function belongs to the whole sentence.
@@ -46,7 +46,7 @@ Production Pass 2 sees both Pass 1 proposals and rationales:
 - Sense Pass 2 reviews the initial sense while also seeing the proposed sentence function.
 - Function Pass 2 reviews the initial function while also seeing the proposed lexical sense.
 
-The second pass may use the other annotation as contextual evidence, but must not treat it as determinative. It records whether it accepts, changes or is uncertain about Pass 1, and explains whether sense–function interaction affected the decision.
+The second pass may use the other annotation as contextual evidence, but must not treat it as determinative. It records whether it accepts, changes or is uncertain about Pass 1, and explains whether sense–function interaction affected the decision. The final sense and function remain separately recorded judgements.
 
 ### Blind validation sample
 
