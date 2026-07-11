@@ -32,7 +32,8 @@ def main() -> None:
     records, _, hierarchy = read_taxonomy(Path(args.taxonomy)); taxonomy_text = compact_taxonomy_text(records)
     output = Path(args.output); done = load_done_ids(output)
     properties = {"row_id":{"type":"string"}, "pass1_function_id":{"type":"string"}, "pass2_function_id":{"type":"string"}, "final_function_id":{"type":"string"}, "final_function_label":{"type":"string"}, "final_confidence":{"type":"string", "enum":["high","medium","low"]}, "adjudication_rationale":{"type":"string"}, "human_review_recommended":{"type":"boolean"}}
-    schema = make_schema("function_adjudication", properties, FIELDS)
+    required_output = ["row_id", "pass1_function_id", "pass2_function_id", "final_function_id", "final_function_label", "final_confidence", "adjudication_rationale", "human_review_recommended"]
+    schema = make_schema("function_adjudication", properties, required_output)
     for _, series in cases.iterrows():
         row = {key:str(value) for key,value in series.to_dict().items()}
         if row["row_id"] in done: continue
@@ -44,6 +45,7 @@ SENTENCE
 PASS 1: {row['pass1_function_id']} | {row['pass1_confidence']} | {row['pass1_rationale']}
 PASS 2: {row['pass2_function_id']} | {row['pass2_confidence']} | {row['pass2_rationale']}"""
         result = call_model_json(args.model, prompt, schema); result = apply_taxonomy_fields(result, "final_function_id", hierarchy)
+        result["sentence"] = row["sentence"]
         append_csv_row(output, FIELDS, result); done.add(row["row_id"])
         print(f"Function adjudication {row['row_id']}: {result['final_function_id']}")
 
