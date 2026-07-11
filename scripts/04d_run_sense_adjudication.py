@@ -36,10 +36,12 @@ def main() -> None:
         row = {key: str(value) for key, value in series.to_dict().items()}
         if row["row_id"] in done: continue
         inventory = inventory_for_row(row, inventories); valid_ids = [x["sense_id"] for x in inventory]
-        schema = make_schema("sense_adjudication", {
+        properties = {
             "row_id":{"type":"string"}, "pass1_sense_id":{"type":"string"}, "pass2_sense_id":{"type":"string"},
             "final_sense_id":{"type":"string", "enum":valid_ids}, "final_confidence":{"type":"string", "enum":["high","medium","low"]},
-            "adjudication_rationale":{"type":"string"}, "human_review_recommended":{"type":"boolean"}}, FIELDS[0:1]+FIELDS[5:])
+            "adjudication_rationale":{"type":"string"}, "human_review_recommended":{"type":"boolean"}}
+        required_output = ["row_id", "pass1_sense_id", "pass2_sense_id", "final_sense_id", "final_confidence", "adjudication_rationale", "human_review_recommended"]
+        schema = make_schema("sense_adjudication", properties, required_output)
         prompt = f"""Adjudicate two independent lexical-sense annotations. Judge the target lemma meaning, not sentence function. Use only the approved inventory. Recommend human review for unresolved ambiguity, OTHER, UNCLEAR or likely inventory problems.
 INVENTORY
 {compact_inventory(inventory)}
