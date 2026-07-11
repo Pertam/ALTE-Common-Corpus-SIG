@@ -10,7 +10,7 @@
 <header>
   <div class="header-inner">
     <h1>ALTE Common Corpus SIG</h1>
-    <p>A multilingual, sense-aware and function-aware workflow supporting the European CEFR Vocabulary Atlas pilot.</p>
+    <p>Building a multilingual, sense-aware evidence base for vocabulary learning, assessment and CEFR research.</p>
   </div>
 </header>
 <nav>
@@ -18,123 +18,111 @@
     <a href="index.html">Home</a>
     <a href="rationale-and-use-cases.html">Rationale</a>
     <a href="workflow.html">Workflow</a>
-    <a href="technical-setup.html">Technical setup</a>
-    <a href="reviewer-area.html">Reviewer area</a>
+    <a href="join-the-pilot.html">Join the pilot</a>
     <a href="methodology.html">Methodology</a>
+    <a href="reviewer-area.html">Reviewer area</a>
+    <a href="technical-setup.html">Technical setup</a>
     <a href="faq.html">FAQ</a>
-    <a href="further-reading.html">Further reading</a>
   </div>
 </nav>
 <main>
   <div class="notice">
-    <strong>Pilot material — not validated CEFR data.</strong>
-    All AI-assisted outputs are provisional Tier 4 candidate material requiring expert review.
+    <strong>This is an open methodological pilot.</strong>
+    The project is developing and testing a shared approach; it is not yet a validated CEFR vocabulary resource.
   </div>
 
   <section>
     <h2>Why this project matters</h2>
-    <p>Existing multilingual vocabulary resources often tell us which words occur, but not clearly which <strong>sense</strong> of a word is being used, what the surrounding sentence is doing communicatively, or how those patterns differ across languages.</p>
-    <p>This pilot tests whether corpus evidence, lexical-sense analysis, communicative-function tagging and expert judgement can be combined into a transparent multilingual resource. The aim is to produce sense-specific functional profiles rather than treating every use of a headword as though it meant the same thing.</p>
-    <div class="card-grid">
-      <a class="card card-link" href="rationale-and-use-cases.html">
-        <h3>Read the full rationale</h3>
-        <p>Explore the research gap, potential applications and questions the pilot is designed to test.</p>
-        <span class="read-more">Why this project matters →</span>
-      </a>
-      <a class="card card-link" href="https://github.com/Pertam/ALTE-Common-Corpus-SIG/issues">
-        <h3>Join the pilot</h3>
-        <p>Contribute language expertise, sense-inventory review, taxonomy review, validation, corpus methodology, cross-language alignment or technical development.</p>
-        <span class="read-more">Join the discussion →</span>
-      </a>
-    </div>
+    <p>Vocabulary is central to language learning, teaching and assessment, but the available evidence is difficult to use across languages. CEFR-linked vocabulary resources are often language-specific, uneven in coverage and organised around headwords rather than meanings.</p>
+    <p>This creates a fundamental problem. A word may have several senses, apparently equivalent words may behave differently across languages, and frequency alone does not tell us what learners need to do with vocabulary in real communication.</p>
+    <p>Current resources and research rarely bring all of these dimensions together in one transparent multilingual workflow:</p>
+    <ul>
+      <li>the <strong>specific sense</strong> of a word in context;</li>
+      <li>the <strong>communicative function</strong> of the sentence in which it occurs;</li>
+      <li>comparable evidence across several European languages;</li>
+      <li>corpus evidence, AI-assisted analysis and traceable expert review.</li>
+    </ul>
+    <p>The SIG is exploring whether that gap can be addressed collaboratively.</p>
   </section>
 
   <section>
     <h2>What the pilot is building</h2>
-    <p>The pilot covers English, French, Spanish, German and Czech. Its fundamental data unit is <strong>one target lemma occurrence in one sentence</strong>.</p>
-    <p>Each row records two distinct but related judgements:</p>
-    <ul>
-      <li><strong>Lexical sense:</strong> what the target lemma means in that sentence.</li>
-      <li><strong>Communicative function:</strong> what the whole sentence is doing.</li>
-    </ul>
-  </section>
-
-  <section>
-    <h2>Sense and function are different</h2>
-    <table>
-      <tr><th>Sentence</th><th>Target</th><th>Lexical sense</th><th>Sentence function</th></tr>
-      <tr><td><em>Apply the cream twice daily.</em></td><td><code>apply</code></td><td>put a substance onto a surface</td><td>giving an instruction</td></tr>
-      <tr><td><em>The rule applies to all applicants.</em></td><td><code>apply</code></td><td>be relevant or valid</td><td>stating a rule or condition</td></tr>
-    </table>
-    <p>Sense belongs to the target lemma; function belongs to the sentence. Pass 1 produces them as separate decisions. Pass 2 then performs an informed critical review of both while still recording a separate final decision for sense and function.</p>
-  </section>
-
-  <section>
-    <h2>How the annotation passes work</h2>
-    <table>
-      <tr><th>Pass</th><th>Purpose</th><th>Information available</th></tr>
-      <tr><td>Pass 1</td><td>Produce initial sense and function proposals</td><td>Sentence, target lemma, approved sense inventory and function taxonomy</td></tr>
-      <tr><td>Pass 2</td><td>Critically review, accept, change or flag the initial proposals</td><td>Pass 1 sense, Pass 1 function and both rationales</td></tr>
-      <tr><td>Blind validation sample</td><td>Estimate reliability and possible anchoring</td><td>Original inputs only; Pass 1 is hidden</td></tr>
-      <tr><td>Adjudication and expert review</td><td>Resolve selected difficult or changed cases</td><td>Full annotation evidence and review history</td></tr>
-    </table>
-  </section>
-
-  <section>
-    <h2>The six-stage workflow</h2>
-    <p>Select any stage to see its purpose, inputs, outputs and methodological safeguards.</p>
+    <p>The project is developing a reusable package of methods, taxonomies, scripts, reviewer guidance and pilot data for English, French, Spanish, German and Czech.</p>
     <div class="card-grid">
-      <a class="card card-link" href="stage1-corpus-preparation.html">
-        <h3>Stage 1: Corpus preparation</h3>
-        <p>Document corpus source, licence, language, date, register and file structure.</p>
-        <span class="read-more">Open Stage 1 →</span>
+      <div class="card">
+        <h3>Sense-aware vocabulary evidence</h3>
+        <p>Words are analysed by their meaning in context, so different senses of the same headword are not automatically treated as one item.</p>
+      </div>
+      <div class="card">
+        <h3>Function-aware examples</h3>
+        <p>Sentences are also examined for what they are doing communicatively, such as describing, requesting, explaining, evaluating or reporting.</p>
+      </div>
+      <div class="card">
+        <h3>Multilingual comparison</h3>
+        <p>Language-specific senses can be compared without assuming that English distinctions map neatly onto every other language.</p>
+      </div>
+      <div class="card">
+        <h3>Transparent human review</h3>
+        <p>AI-assisted outputs remain provisional, with explicit inventories, rationales, review decisions, adjudication and validation evidence.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Why it could be important</h2>
+    <p>If the methodology works, the resulting evidence could support more defensible decisions about vocabulary selection, sequencing, task difficulty and cross-language comparability.</p>
+    <div class="card-grid">
+      <div class="card">
+        <h3>Learning and teaching</h3>
+        <p>Support curriculum designers, teachers and materials writers in deciding which meanings learners need, when they need them and in which communicative contexts.</p>
+      </div>
+      <div class="card">
+        <h3>Language assessment</h3>
+        <p>Provide additional evidence for text selection, vocabulary-load analysis, item review and the interpretation of lexical demands at different CEFR levels.</p>
+      </div>
+      <div class="card">
+        <h3>Research and policy</h3>
+        <p>Create a shared multilingual evidence base for studying lexical difficulty, polysemy, functional environments and comparability across languages.</p>
+      </div>
+    </div>
+    <p><a class="button" href="rationale-and-use-cases.html">Read the full rationale and use cases</a></p>
+  </section>
+
+  <section>
+    <h2>Join the pilot</h2>
+    <p>The project is at the stage where additional expertise can shape the methodology rather than simply review a finished product. Participation is open to colleagues interested in languages, corpora, CEFR research, assessment, vocabulary, NLP, validation or reproducible technical workflows.</p>
+    <p>Coding experience is not required. Contributors could review sense inventories, test the function taxonomy, examine examples in a particular language, advise on validation, improve the workflow or help align concepts across languages.</p>
+    <div class="card-grid">
+      <a class="card card-link" href="join-the-pilot.html">
+        <h3>How to take part</h3>
+        <p>See the contribution areas, expected commitments and practical ways to become involved.</p>
+        <span class="read-more">Join the pilot →</span>
       </a>
-      <a class="card card-link" href="stage2-processing.html">
-        <h3>Stage 2: Processing and lemma statistics</h3>
-        <p>Tokenise, POS-tag, lemmatise and calculate frequency and dispersion evidence.</p>
-        <span class="read-more">Open Stage 2 →</span>
-      </a>
-      <a class="card card-link" href="stage3-sampling.html">
-        <h3>Stage 3: Target-occurrence sampling</h3>
-        <p>Select eligible lemmas and create stable sentence rows for each target occurrence.</p>
-        <span class="read-more">Open Stage 3 →</span>
-      </a>
-      <a class="card card-link" href="stage4-sense-tagging.html">
-        <h3>Stage 4: Lexical-sense tagging</h3>
-        <p>Create human-approved sense inventories, produce an initial sense proposal and run informed review.</p>
-        <span class="read-more">Open Stage 4 →</span>
-      </a>
-      <a class="card card-link" href="stage5-function-tagging.html">
-        <h3>Stage 5: Communicative-function tagging</h3>
-        <p>Produce an initial sentence-function proposal and run informed taxonomy-based review.</p>
-        <span class="read-more">Open Stage 5 →</span>
-      </a>
-      <a class="card card-link" href="stage6-qa-review.html">
-        <h3>Stage 6: Combined QA and expert review</h3>
-        <p>Adjudicate selected cases, preserve separate decisions and aggregate by sense.</p>
-        <span class="read-more">Open Stage 6 →</span>
+      <a class="card card-link" href="https://github.com/Pertam/ALTE-Common-Corpus-SIG/issues">
+        <h3>Start a discussion</h3>
+        <p>Introduce your interests, propose a language or methodology contribution, or raise a question.</p>
+        <span class="read-more">Open GitHub discussions →</span>
       </a>
     </div>
-    <p><a class="button" href="workflow.html">View the complete workflow overview</a></p>
   </section>
 
   <section>
-    <h2>Review and methodology</h2>
+    <h2>Explore the project</h2>
     <div class="card-grid">
+      <a class="card card-link" href="workflow.html">
+        <h3>Workflow</h3>
+        <p>See the complete six-stage process from corpus preparation to expert review.</p>
+        <span class="read-more">Explore the workflow →</span>
+      </a>
       <a class="card card-link" href="methodology.html">
-        <h3>Methodological principles</h3>
-        <p>Sense granularity, informed review, validation and multilingual alignment.</p>
-        <span class="read-more">Open methodology →</span>
+        <h3>Methodology</h3>
+        <p>Read the principles governing sense inventories, informed review, validation and multilingual analysis.</p>
+        <span class="read-more">Read the methodology →</span>
       </a>
       <a class="card card-link" href="reviewer-area.html">
-        <h3>Reviewer area</h3>
-        <p>Guidance for reviewing provisional sense and communicative-function annotations.</p>
-        <span class="read-more">Open reviewer area →</span>
-      </a>
-      <a class="card card-link" href="technical-setup.html">
-        <h3>Technical setup</h3>
-        <p>How the GitHub, Colab and storage workflow is organised for reproducible collaboration.</p>
-        <span class="read-more">Open technical setup →</span>
+        <h3>Reviewer guidance</h3>
+        <p>See how provisional sense and function annotations are reviewed and adjudicated.</p>
+        <span class="read-more">Open the reviewer area →</span>
       </a>
     </div>
   </section>
@@ -142,9 +130,9 @@
 <footer>
   <div>
     <strong>ALTE Common Corpus SIG</strong><br>
-    European CEFR Vocabulary Atlas pilot support workflow.<br>
+    European CEFR Vocabulary Atlas pilot.<br>
     <a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG">Project repository on GitHub</a> ·
-    <a href="https://github.com/Pertam/ALTE-Common-Corpus-SIG/issues">Questions and feedback</a> ·
+    <a href="join-the-pilot.html">Join the pilot</a> ·
     Last updated 11 July 2026.
   </div>
 </footer>
