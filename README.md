@@ -11,7 +11,7 @@ A collaborative methodological pilot testing whether corpus evidence, lexical-se
 
 Each dataset row represents **one target lemma occurrence in one corpus sentence**.
 
-The row carries two independent annotations:
+The row carries two distinct annotations:
 
 - **lexical sense** — what the target lemma means in that sentence;
 - **communicative function** — what the whole sentence is doing communicatively.
@@ -26,9 +26,31 @@ The row carries two independent annotations:
 1. **Corpus preparation** — document source, licence, language, date and register.
 2. **Processing and lemma statistics** — tokenise, POS-tag, lemmatise and calculate corpus evidence.
 3. **Target-occurrence sampling** — sample lemmas and sentences while preserving stable row IDs.
-4. **Lexical-sense tagging** — propose a coarse sense inventory, obtain human approval, run two independent sentence-level sense passes and adjudicate disagreements.
-5. **Communicative-function tagging** — run two independent sentence-level function passes and adjudicate disagreements using the controlled CEFR-derived taxonomy.
-6. **Combined QA and expert review** — merge sense and function outputs, review them separately, and aggregate by `language + lemma + sense`.
+4. **Lexical-sense tagging** — propose a coarse sense inventory, obtain human approval, produce an initial sense annotation and run an informed critical review.
+5. **Communicative-function tagging** — produce an initial sentence-function annotation and run an informed critical review using the controlled CEFR-derived taxonomy.
+6. **Combined QA and expert review** — adjudicate selected cases, merge sense and function outputs, review them separately, and aggregate by `language + lemma + sense`.
+
+## Annotation design
+
+### Pass 1: initial annotations
+
+Sense Pass 1 and Function Pass 1 are produced separately. This keeps the basic distinction clear:
+
+- sense belongs to the target lemma occurrence;
+- function belongs to the whole sentence.
+
+### Pass 2: informed critical review
+
+Production Pass 2 sees both Pass 1 proposals and rationales:
+
+- Sense Pass 2 reviews the initial sense while also seeing the proposed sentence function.
+- Function Pass 2 reviews the initial function while also seeing the proposed lexical sense.
+
+The second pass may use the other annotation as contextual evidence, but must not treat it as determinative. It records whether it accepts, changes or is uncertain about Pass 1, and explains whether sense–function interaction affected the decision.
+
+### Blind validation sample
+
+The Pass 2 scripts retain a `--blind` mode for a smaller sampled reliability study. Blind results should be stored separately and compared with informed review and human decisions; they are not the default production workflow.
 
 ## Pilot languages
 
@@ -62,25 +84,71 @@ python scripts/04a_create_sense_inventory.py \
 
 A human language expert must review it and set retained rows to `inventory_status=approved`.
 
-Run two independent sense passes and adjudication:
+Run Sense Pass 1 after the inventory is approved:
 
 ```bash
-python scripts/04b_run_sense_pass1.py --samples data/en_sampled_occurrences.csv --inventory data/en_sense_inventory.csv --output data/en_sense_pass1.csv
-python scripts/04c_run_sense_pass2.py --samples data/en_sampled_occurrences.csv --inventory data/en_sense_inventory.csv --output data/en_sense_pass2.csv
-python scripts/04d_run_sense_adjudication.py --pass1 data/en_sense_pass1.csv --pass2 data/en_sense_pass2.csv --inventory data/en_sense_inventory.csv --only_problem_cases --output data/en_sense_pass3.csv
+python scripts/04b_run_sense_pass1.py \
+  --samples data/en_sampled_occurrences.csv \
+  --inventory data/en_sense_inventory.csv \
+  --output data/en_sense_pass1.csv
 ```
 
-Pass 2 does not see Pass 1.
-
-## Function tagging
+## Function Pass 1
 
 ```bash
-python scripts/05a_run_pass1.py --sentences data/en_sampled_occurrences.csv --taxonomy taxonomy/cefr_function_taxonomy_v0_2.csv --output data/en_function_pass1.csv
-python scripts/05b_run_pass2.py --sentences data/en_sampled_occurrences.csv --taxonomy taxonomy/cefr_function_taxonomy_v0_2.csv --output data/en_function_pass2.csv
-python scripts/05c_run_pass3.py --pass1 data/en_function_pass1.csv --pass2 data/en_function_pass2.csv --taxonomy taxonomy/cefr_function_taxonomy_v0_2.csv --only_problem_cases --output data/en_function_pass3.csv
+python scripts/05a_run_pass1.py \
+  --sentences data/en_sampled_occurrences.csv \
+  --taxonomy taxonomy/cefr_function_taxonomy_v0_2.csv \
+  --output data/en_function_pass1.csv
 ```
 
-Function Pass 2 is also independent and does not see Pass 1.
+## Informed Pass 2 reviews
+
+```bash
+python scripts/04c_run_sense_pass2.py \
+  --samples data/en_sampled_occurrences.csv \
+  --inventory data/en_sense_inventory.csv \
+  --pass1 data/en_sense_pass1.csv \
+  --function_pass1 data/en_function_pass1.csv \
+  --output data/en_sense_pass2.csv
+
+python scripts/05b_run_pass2.py \
+  --sentences data/en_sampled_occurrences.csv \
+  --taxonomy taxonomy/cefr_function_taxonomy_v0_2.csv \
+  --pass1 data/en_function_pass1.csv \
+  --sense_pass1 data/en_sense_pass1.csv \
+  --output data/en_function_pass2.csv
+```
+
+## Targeted adjudication
+
+```bash
+python scripts/04d_run_sense_adjudication.py \
+  --pass1 data/en_sense_pass1.csv \
+  --pass2 data/en_sense_pass2.csv \
+  --inventory data/en_sense_inventory.csv \
+  --only_problem_cases \
+  --output data/en_sense_pass3.csv
+
+python scripts/05c_run_pass3.py \
+  --pass1 data/en_function_pass1.csv \
+  --pass2 data/en_function_pass2.csv \
+  --taxonomy taxonomy/cefr_function_taxonomy_v0_2.csv \
+  --only_problem_cases \
+  --output data/en_function_pass3.csv
+```
+
+## Optional blind validation sample
+
+Run the same Pass 2 scripts with `--blind` on a separately sampled subset and a separate output path. Do not mix blind and informed rows in the same output file.
+
+```bash
+python scripts/04c_run_sense_pass2.py \
+  --samples data/en_blind_sample.csv \
+  --inventory data/en_sense_inventory.csv \
+  --blind \
+  --output data/en_sense_pass2_blind.csv
+```
 
 ## Combined review dataset
 
