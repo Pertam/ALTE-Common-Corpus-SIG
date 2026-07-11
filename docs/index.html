@@ -34,7 +34,7 @@
   <section>
     <h2>Project overview</h2>
     <p>The pilot tests how corpus evidence, lexical senses, language-specific forms, sentence-level communicative functions and expert judgement can be combined across English, French, Spanish, German and Czech.</p>
-    <p>The fundamental data unit is <strong>one target lemma occurrence in one sentence</strong>. Each row receives two independent annotations: the sense of the target lemma and the communicative function of the whole sentence.</p>
+    <p>The fundamental data unit is <strong>one target lemma occurrence in one sentence</strong>. Each row receives two distinct annotations: the sense of the target lemma and the communicative function of the whole sentence.</p>
   </section>
 
   <section>
@@ -44,7 +44,18 @@
       <tr><td><em>Apply the cream twice daily.</em></td><td><code>apply</code></td><td>put a substance onto a surface</td><td>giving an instruction</td></tr>
       <tr><td><em>The rule applies to all applicants.</em></td><td><code>apply</code></td><td>be relevant or valid</td><td>stating a rule or condition</td></tr>
     </table>
-    <p>Sense belongs to the target lemma; function belongs to the sentence. They are labelled independently and combined only for review and analysis.</p>
+    <p>Sense belongs to the target lemma; function belongs to the sentence. Pass 1 produces them separately. Pass 2 then performs an informed critical review of both, while still recording a separate final decision for sense and function.</p>
+  </section>
+
+  <section>
+    <h2>How the annotation passes work</h2>
+    <table>
+      <tr><th>Pass</th><th>Purpose</th><th>Information available</th></tr>
+      <tr><td>Pass 1</td><td>Produce initial sense and function proposals</td><td>Sentence, target lemma, approved sense inventory and function taxonomy</td></tr>
+      <tr><td>Pass 2</td><td>Critically review, accept, change or flag the initial proposals</td><td>Pass 1 sense, Pass 1 function and both rationales</td></tr>
+      <tr><td>Blind validation sample</td><td>Estimate reliability and possible anchoring</td><td>Original inputs only; Pass 1 is hidden</td></tr>
+      <tr><td>Adjudication and expert review</td><td>Resolve selected difficult or changed cases</td><td>Full annotation evidence and review history</td></tr>
+    </table>
   </section>
 
   <section>
@@ -68,17 +79,17 @@
       </a>
       <a class="card card-link" href="stage4-sense-tagging.html">
         <h3>Stage 4: Lexical-sense tagging</h3>
-        <p>Create human-approved sense inventories and label the target lemma meaning independently.</p>
+        <p>Create human-approved sense inventories, produce an initial sense proposal and run informed review.</p>
         <span class="read-more">Open Stage 4 →</span>
       </a>
       <a class="card card-link" href="stage5-function-tagging.html">
         <h3>Stage 5: Communicative-function tagging</h3>
-        <p>Label what the whole sentence is doing using independent taxonomy-based passes.</p>
+        <p>Produce an initial sentence-function proposal and run informed taxonomy-based review.</p>
         <span class="read-more">Open Stage 5 →</span>
       </a>
       <a class="card card-link" href="stage6-qa-review.html">
         <h3>Stage 6: Combined QA and expert review</h3>
-        <p>Join sense and function outputs, preserve separate decisions and aggregate by sense.</p>
+        <p>Adjudicate selected cases, preserve separate decisions and aggregate by sense.</p>
         <span class="read-more">Open Stage 6 →</span>
       </a>
     </div>
@@ -95,7 +106,7 @@
       </a>
       <a class="card card-link" href="methodology.html">
         <h3>Methodological principles</h3>
-        <p>Sense granularity, annotation independence, validation and multilingual alignment.</p>
+        <p>Sense granularity, informed review, validation and multilingual alignment.</p>
         <span class="read-more">Open methodology →</span>
       </a>
       <a class="card card-link" href="reviewer-area.html">
