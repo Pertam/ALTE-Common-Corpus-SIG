@@ -11,6 +11,7 @@ from pathlib import Path
 import pandas as pd
 
 EXPERT_COLUMNS = [
+    "reviewer_id", "review_timestamp", "review_input_version",
     "expert_sense_decision", "expert_sense_id", "expert_sense_comment",
     "expert_function_decision", "expert_function_id", "expert_function_comment",
     "adjudication_required",
@@ -43,12 +44,33 @@ def assert_unique_rows(df: pd.DataFrame, label: str) -> None:
         raise ValueError(f"{label} contains duplicate row_id values: {dupes}")
 
 
+def assert_same_coverage(base: pd.DataFrame, other: pd.DataFrame, label: str) -> None:
+    base_ids = set(base["row_id"].astype(str))
+    other_ids = set(other["row_id"].astype(str))
+    if base_ids != other_ids:
+        missing = sorted(base_ids - other_ids)[:20]
+        extra = sorted(other_ids - base_ids)[:20]
+        raise ValueError(
+            f"{label} row coverage does not exactly match Samples. "
+            f"Missing sample IDs (first 20): {missing}; extra IDs (first 20): {extra}"
+        )
+
+
+def assert_subset_coverage(base: pd.DataFrame, other: pd.DataFrame, label: str) -> None:
+    base_ids = set(base["row_id"].astype(str))
+    extra = sorted(set(other["row_id"].astype(str)) - base_ids)[:20]
+    if extra:
+        raise ValueError(f"{label} contains row IDs not present in Samples: {extra}")
+
+
 def merge_family(base, p1, p2, p3, family, id_col, label_col):
     required = ["row_id", id_col, label_col, "confidence", "rationale", "requires_review"]
     require(p1, required, f"{family} Pass 1")
     require(p2, required, f"{family} Pass 2")
     assert_unique_rows(p1, f"{family} Pass 1")
     assert_unique_rows(p2, f"{family} Pass 2")
+    assert_same_coverage(base, p1, f"{family} Pass 1")
+    assert_same_coverage(base, p2, f"{family} Pass 2")
 
     def slim(df: pd.DataFrame, prefix: str, extra: list[str] | None = None) -> pd.DataFrame:
         keep = list(required)
@@ -68,14 +90,16 @@ def merge_family(base, p1, p2, p3, family, id_col, label_col):
     p1_conf = result[f"{family}_pass1_confidence"].fillna("")
     p2_conf = result[f"{family}_pass2_confidence"].fillna("")
 
-    has_p2 = p2_id.astype(str).str.strip().ne("")
-    result[f"final_{family}_id"] = p2_id.where(has_p2, p1_id)
-    result[f"final_{family}_label"] = p2_label.where(has_p2, p1_label)
-    result[f"final_{family}_confidence"] = p2_conf.where(has_p2, p1_conf)
-    result[f"final_{family}_source"] = has_p2.map({True: "pass2", False: "pass1"})
+    if p1_id.astype(str).str.strip().eq("").any() or p2_id.astype(str).str.strip().eq("").any():
+        raise ValueError(f"{family} Pass 1/2 contains blank selected IDs; final dataset requires complete candidate annotations.")
+
+    result[f"final_{family}_id"] = p2_id
+    result[f"final_{family}_label"] = p2_label
+    result[f"final_{family}_confidence"] = p2_conf
+    result[f"final_{family}_source"] = "pass2"
 
     review = (
-        (p1_id != p2_id) & has_p2
+        p1_id.ne(p2_id)
         | p1_conf.eq("low")
         | p2_conf.eq("low")
         | bool_series(result[f"{family}_pass1_requires_review"])
@@ -84,11 +108,12 @@ def merge_family(base, p1, p2, p3, family, id_col, label_col):
     validator_col = f"{family}_pass2_validator_decision"
     if validator_col in result.columns:
         validator = result[validator_col].fillna("").astype(str).str.strip().str.lower()
-        review = review | (validator.ne("") & validator.ne("accept"))
+        review = review | validator.ne("accept")
     result[f"{family}_human_review_recommended"] = review.astype(bool)
 
     if p3 is not None and not p3.empty:
         assert_unique_rows(p3, f"{family} Pass 3")
+        assert_subset_coverage(base, p3, f"{family} Pass 3")
         p3_id = f"final_{family}_id"
         p3_label = "final_sense_gloss" if family == "sense" else "final_function_label"
         p3_conf = f"final_{family}_confidence"
@@ -118,6 +143,7 @@ def merge_expert_decisions(final: pd.DataFrame, path: str | None) -> pd.DataFram
 
     expert = read(path, "Expert decisions")
     assert_unique_rows(expert, "Expert decisions")
+    assert_subset_coverage(final, expert, "Expert decisions")
     keep = ["row_id"] + [c for c in EXPERT_COLUMNS if c in expert.columns]
     if len(keep) == 1:
         raise ValueError(f"Expert decisions file must contain at least one of: {EXPERT_COLUMNS}")
