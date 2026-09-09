@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-"""Stage 04: sample lemmas and collect sentence examples.
+"""Stage 04: sample lemmas and collect target-occurrence examples.
 
 Current pilot setting
 ---------------------
 - Random 15 eligible lemmas per language
-- Eligible = content POS and ARF per million >= 50
-- All available sentence examples for each selected lemma
+- Eligible = content POS and pilot ARF-style metric >= 50
+- All available target occurrences for each selected lemma by default
 
-The script also supports a capped sentence sample, e.g. --sentences_n 50,
-when a smaller LLM batch is needed.
+Each output row represents one precise corpus occurrence. ``row_id`` is retained
+for downstream compatibility but is now an alias of the stable ``observation_id``.
+Repeated occurrences of the same lemma in one sentence remain distinct.
 """
 
 from __future__ import annotations
@@ -30,13 +31,26 @@ STATS_COLUMNS = [
     "arf_reduced_frequency",
     "arf_per_million",
     "frequency_band",
+    "frequency_metric_id",
+    "frequency_metric_version",
+    "frequency_metric_formula",
+    "source_dispersion_unit",
 ]
 
 
-def add_row_ids(df: pd.DataFrame, lang: str) -> pd.DataFrame:
-    df = df.reset_index(drop=True).copy()
-    df.insert(0, "row_id", [f"{lang}_{i + 1:06d}" for i in range(len(df))])
-    return df
+def set_stable_row_ids(df: pd.DataFrame) -> pd.DataFrame:
+    out = df.reset_index(drop=True).copy()
+    if "observation_id" not in out.columns:
+        raise ValueError("Occurrence-level input must contain observation_id. Rerun Stage 02 with the current data contract.")
+    if (out["observation_id"].astype(str).str.strip() == "").any():
+        raise ValueError("Blank observation_id found in occurrence index.")
+    if out["observation_id"].duplicated().any():
+        dupes = out.loc[out["observation_id"].duplicated(), "observation_id"].head(20).tolist()
+        raise ValueError(f"Duplicate observation_id values in sampled output: {dupes}")
+    if "row_id" in out.columns:
+        out = out.drop(columns=["row_id"])
+    out.insert(0, "row_id", out["observation_id"].astype(str))
+    return out
 
 
 def sample_lemmas_and_sentences(
@@ -56,7 +70,7 @@ def sample_lemmas_and_sentences(
     if not stats_path.exists():
         raise FileNotFoundError(f"Lemma stats file not found: {stats_path}")
     if not lemma_sentence_path.exists():
-        raise FileNotFoundError(f"Lemma-sentence index file not found: {lemma_sentence_path}")
+        raise FileNotFoundError(f"Target-occurrence index file not found: {lemma_sentence_path}")
     if not sentence_path.exists():
         raise FileNotFoundError(f"Prepared sentence file not found: {sentence_path}")
 
@@ -65,16 +79,25 @@ def sample_lemmas_and_sentences(
     sentences = pd.read_parquet(sentence_path)
 
     stats_required = {"language_code", "lemma", "pos", "arf_per_million"}
-    index_required = {"language_code", "lemma", "pos", "sentence_id", "sentence_uid", "source_id"}
+    index_required = {
+        "observation_id", "language_code", "lemma", "pos", "sentence_id", "sentence_uid", "source_id",
+        "target_token_index", "target_token", "target_char_start", "target_char_end",
+    }
     sentence_required = {"sentence_uid", "sentence"}
     for label, df, required in [
         ("stats", stats, stats_required),
-        ("lemma_sentence", index, index_required),
+        ("target_occurrence", index, index_required),
         ("sentences", sentences, sentence_required),
     ]:
         missing = required - set(df.columns)
         if missing:
-            raise ValueError(f"{label} file is missing columns: {sorted(missing)}")
+            raise ValueError(
+                f"{label} file is missing columns: {sorted(missing)}. "
+                "For occurrence fields, rerun Stage 02 with the current data contract."
+            )
+
+    if index["observation_id"].duplicated().any():
+        raise ValueError("Target-occurrence index contains duplicate observation_id values.")
 
     stats["arf_per_million"] = pd.to_numeric(stats["arf_per_million"], errors="coerce").fillna(0)
     stats_lang = stats[stats["language_code"].astype(str) == lang].copy()
@@ -91,7 +114,6 @@ def sample_lemmas_and_sentences(
         )
 
     selected = eligible.sample(n=lemmas_n, random_state=seed).sort_values(["pos", "lemma"]).reset_index(drop=True)
-
     output_parts: list[pd.DataFrame] = []
 
     for _, lemma_row in selected.iterrows():
@@ -102,23 +124,25 @@ def sample_lemmas_and_sentences(
             (index["language_code"].astype(str) == lang)
             & (index["lemma"].astype(str) == lemma)
             & (index["pos"].astype(str) == pos)
-        ].drop_duplicates("sentence_uid")
+        ].copy()
 
         if candidates.empty:
-            print(f"WARNING: no sentence examples for {lang} {lemma}/{pos}")
+            print(f"WARNING: no target occurrences for {lang} {lemma}/{pos}")
             continue
 
         if all_sentences:
             chosen = candidates.copy()
-            sample_size_requested = "all_sentences"
-            sampling_method = "all_sentences_for_selected_lemmas"
+            sample_size_requested = "all_occurrences"
+            sampling_method = "all_occurrences_for_selected_lemmas"
         else:
             take = min(int(sentences_n), len(candidates))
             chosen = candidates.sample(n=take, random_state=int(rng.integers(1, 2**31 - 1))).copy()
             sample_size_requested = sentences_n
-            sampling_method = "random_sentence_sample_for_selected_lemmas"
+            sampling_method = "random_occurrence_sample_for_selected_lemmas"
 
-        merged = chosen.merge(sentences[["sentence_uid", "sentence"]], on="sentence_uid", how="left")
+        merged = chosen.merge(sentences[["sentence_uid", "sentence"]], on="sentence_uid", how="left", validate="many_to_one")
+        if merged["sentence"].astype(str).str.strip().eq("").any():
+            raise ValueError(f"Sentence join failed for one or more sampled occurrences of {lang} {lemma}/{pos}.")
 
         for col in STATS_COLUMNS:
             merged[col] = lemma_row[col] if col in lemma_row.index else ""
@@ -130,20 +154,26 @@ def sample_lemmas_and_sentences(
         merged["min_arf_per_million"] = min_arf
         merged["sampling_method"] = sampling_method
         merged["random_seed"] = seed
-
         output_parts.append(merged)
 
     if not output_parts:
         raise ValueError(f"No sampled rows produced for {lang}")
 
     out = pd.concat(output_parts, ignore_index=True)
-    out = add_row_ids(out, lang)
+    out = set_stable_row_ids(out)
 
     ordered = [
         "row_id",
+        "observation_id",
         "language_code",
         "lemma",
         "pos",
+        "target_token",
+        "target_token_index",
+        "target_char_start",
+        "target_char_end",
+        "tokenizer_model",
+        "tokenizer_model_version",
         *STATS_COLUMNS,
         "sample_size_requested",
         "sample_size_available",
@@ -165,21 +195,21 @@ def sample_lemmas_and_sentences(
 
     print(f"Language: {lang}")
     print(f"Selected lemmas: {lemmas_n}")
-    print(f"Output rows: {len(out):,}")
+    print(f"Output target occurrences: {len(out):,}")
     print(f"Output: {output_path}")
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Sample eligible lemmas and collect sentence examples.")
+    parser = argparse.ArgumentParser(description="Sample eligible lemmas and collect target-occurrence examples.")
     parser.add_argument("--lang", required=True)
     parser.add_argument("--stats", required=True)
-    parser.add_argument("--lemma_sentence", required=True)
+    parser.add_argument("--lemma_sentence", required=True, help="Occurrence-level index from Stage 02; legacy filename retained")
     parser.add_argument("--sentences", required=True)
     parser.add_argument("--output", required=True)
     parser.add_argument("--min_arf", type=float, default=50)
     parser.add_argument("--lemmas_n", type=int, default=15)
-    parser.add_argument("--sentences_n", type=int, default=50)
-    parser.add_argument("--all_sentences", action="store_true")
+    parser.add_argument("--sentences_n", type=int, default=50, help="Number of target occurrences per lemma when not using --all_sentences")
+    parser.add_argument("--all_sentences", action="store_true", help="Legacy flag name: include all target occurrences for each selected lemma")
     parser.add_argument("--seed", type=int, default=20260603)
     args = parser.parse_args()
 

@@ -41,24 +41,18 @@ FIELDS = [
 ]
 
 
-def schema() -> dict:
+def schema(valid_ids: set[str]) -> dict:
     return make_schema(
         "cefr_function_pass1",
         {
-            "row_id": {"type": "string"},
-            "sentence": {"type": "string"},
-            "top_level_label": {"type": "string"},
-            "subcategory_id": {"type": "string"},
-            "subcategory_label": {"type": "string"},
-            "function_id": {"type": "string"},
-            "function_label": {"type": "string"},
+            "function_id": {"type": "string", "enum": sorted(valid_ids)},
             "confidence": {"type": "string", "enum": ["high", "medium", "low"]},
             "rationale": {"type": "string"},
             "alternative_function_id": {"type": "string"},
             "ambiguity_note": {"type": "string"},
             "requires_review": {"type": "boolean"},
         },
-        FIELDS,
+        ["function_id", "confidence", "rationale", "alternative_function_id", "ambiguity_note", "requires_review"],
     )
 
 
@@ -80,14 +74,16 @@ CONTROLLED TAXONOMY
 {taxonomy_text}
 
 SENTENCE
-row_id: {row['row_id']}
-sentence: {row['sentence']}
+{row['sentence']}
 """
-    result = call_model_json(model, instructions, schema())
+    result = call_model_json(model, instructions, schema(set(hierarchy)))
     result = apply_taxonomy_fields(result, "function_id", hierarchy)
     alt = str(result.get("alternative_function_id", "")).strip()
     if alt and alt not in hierarchy:
         result["alternative_function_id"] = ""
+    # Row identity and taxonomy labels are deterministic pipeline data.
+    result["row_id"] = row["row_id"]
+    result["sentence"] = row["sentence"]
     return result
 
 
@@ -110,6 +106,25 @@ def dry_run_result(row: dict[str, str], hierarchy: dict[str, dict[str, str]]) ->
     }
 
 
+def normalise_sample_ids(data: pd.DataFrame) -> pd.DataFrame:
+    result = data.copy()
+    if "row_id" not in result.columns:
+        if "observation_id" in result.columns:
+            result.insert(0, "row_id", result["observation_id"].astype(str))
+        else:
+            raise ValueError(
+                "Sentence sample requires row_id or observation_id. "
+                "Do not generate positional IDs; rerun occurrence-level sampling."
+            )
+    if "observation_id" in result.columns:
+        mismatch = result["row_id"].astype(str) != result["observation_id"].astype(str)
+        if mismatch.any():
+            raise ValueError("Sentence sample row_id does not match observation_id.")
+    if result["row_id"].duplicated().any():
+        raise ValueError("Sentence sample contains duplicate row_id values.")
+    return result
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run independent Function Pass 1.")
     parser.add_argument(
@@ -117,7 +132,7 @@ def main() -> None:
         "--input",
         dest="sentences",
         required=True,
-        help="Sampled target-occurrence CSV from Stage 03",
+        help="Sampled target-occurrence CSV from Stage 04",
     )
     parser.add_argument("--taxonomy", required=True)
     parser.add_argument("--output", required=True)
@@ -132,9 +147,7 @@ def main() -> None:
 
     data = pd.read_csv(args.sentences, dtype=str).fillna("")
     require_columns(data, ["sentence"], "Sentence sample")
-    if "row_id" not in data.columns:
-        data.insert(0, "row_id", [f"row_{i + 1:06d}" for i in range(len(data))])
-        print("WARNING: input had no row_id; generated row_000001-style IDs.")
+    data = normalise_sample_ids(data)
     if args.limit > 0:
         data = data.head(args.limit)
 

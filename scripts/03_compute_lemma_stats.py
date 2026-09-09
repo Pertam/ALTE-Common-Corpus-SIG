@@ -3,9 +3,10 @@
 
 Important methodological note
 -----------------------------
-The ARF value here is a transparent pilot measure based on raw token frequency
-and sentence dispersion. It is not external CEFR evidence and should not be
-reported as validated corpus evidence outside this pilot workflow.
+The reduced-frequency value here is a transparent *pilot proxy* based on raw
+token frequency and sentence dispersion. It is not a standard ARF implementation,
+not CEFR evidence, and must not be compared across artifacts unless the metric ID
+and version match.
 """
 
 from __future__ import annotations
@@ -17,28 +18,32 @@ import numpy as np
 import pandas as pd
 
 CONTENT_POS = {"NOUN", "VERB", "ADJ", "ADV"}
+FREQUENCY_METRIC_ID = "pilot_sentence_dispersion_reduced_frequency"
+FREQUENCY_METRIC_VERSION = "v1"
+FREQUENCY_METRIC_FORMULA = "raw_frequency * sqrt(sentence_count / total_sentences); per_million = reduced_frequency / total_tokens * 1e6"
+SOURCE_DISPERSION_UNIT = "source_id_values_in_prepared_input"
 
 
 def compute_stats(lang: str, token_path: Path, lemma_sentence_path: Path, output_path: Path) -> None:
     if not token_path.exists():
         raise FileNotFoundError(f"Token file not found: {token_path}")
     if not lemma_sentence_path.exists():
-        raise FileNotFoundError(f"Lemma-sentence index file not found: {lemma_sentence_path}")
+        raise FileNotFoundError(f"Target-occurrence index file not found: {lemma_sentence_path}")
 
     tokens = pd.read_parquet(token_path)
-    lemma_sentence = pd.read_parquet(lemma_sentence_path)
+    lemma_occurrence = pd.read_parquet(lemma_sentence_path)
 
     token_required = {"language_code", "lemma", "pos", "is_alpha", "sentence_uid", "source_id"}
     index_required = {"language_code", "lemma", "pos", "sentence_uid", "source_id"}
     missing_tokens = token_required - set(tokens.columns)
-    missing_index = index_required - set(lemma_sentence.columns)
+    missing_index = index_required - set(lemma_occurrence.columns)
     if missing_tokens:
         raise ValueError(f"Token file is missing columns: {sorted(missing_tokens)}")
     if missing_index:
-        raise ValueError(f"Lemma-sentence index is missing columns: {sorted(missing_index)}")
+        raise ValueError(f"Target-occurrence index is missing columns: {sorted(missing_index)}")
 
     tokens = tokens[tokens["language_code"].astype(str) == lang].copy()
-    lemma_sentence = lemma_sentence[lemma_sentence["language_code"].astype(str) == lang].copy()
+    lemma_occurrence = lemma_occurrence[lemma_occurrence["language_code"].astype(str) == lang].copy()
 
     if tokens.empty:
         raise ValueError(f"No token rows for language {lang}")
@@ -60,14 +65,14 @@ def compute_stats(lang: str, token_path: Path, lemma_sentence_path: Path, output
     )
 
     dispersion = (
-        lemma_sentence.groupby(["language_code", "lemma", "pos"], as_index=False)
+        lemma_occurrence.groupby(["language_code", "lemma", "pos"], as_index=False)
         .agg(
             sentence_count=("sentence_uid", "nunique"),
             source_count=("source_id", "nunique"),
         )
     )
 
-    stats = freq.merge(dispersion, on=["language_code", "lemma", "pos"], how="left")
+    stats = freq.merge(dispersion, on=["language_code", "lemma", "pos"], how="left", validate="one_to_one")
     stats["sentence_count"] = stats["sentence_count"].fillna(0).astype(int)
     stats["source_count"] = stats["source_count"].fillna(0).astype(int)
 
@@ -75,9 +80,14 @@ def compute_stats(lang: str, token_path: Path, lemma_sentence_path: Path, output
     stats["sentence_dispersion"] = stats["sentence_count"] / total_sentences
     stats["source_dispersion"] = stats["source_count"] / total_sources
 
-    # Practical pilot reduced frequency: raw frequency penalised if sentence dispersion is low.
+    # Pilot reduced-frequency proxy. Do not relabel this as standard ARF without validation.
     stats["arf_reduced_frequency"] = stats["raw_frequency"] * np.sqrt(stats["sentence_dispersion"].clip(lower=0))
     stats["arf_per_million"] = stats["arf_reduced_frequency"] / total_tokens * 1_000_000
+
+    stats["frequency_metric_id"] = FREQUENCY_METRIC_ID
+    stats["frequency_metric_version"] = FREQUENCY_METRIC_VERSION
+    stats["frequency_metric_formula"] = FREQUENCY_METRIC_FORMULA
+    stats["source_dispersion_unit"] = SOURCE_DISPERSION_UNIT
 
     stats["frequency_band"] = pd.cut(
         stats["arf_per_million"],
@@ -93,14 +103,16 @@ def compute_stats(lang: str, token_path: Path, lemma_sentence_path: Path, output
     print(f"Language: {lang}")
     print(f"Total tokens used as denominator: {total_tokens:,}")
     print(f"Lemma rows saved: {len(stats):,}")
+    print(f"Frequency metric: {FREQUENCY_METRIC_ID} {FREQUENCY_METRIC_VERSION}")
+    print(f"Source dispersion unit: {SOURCE_DISPERSION_UNIT}")
     print(f"Output: {output_path}")
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Compute lemma frequency and pilot ARF-style statistics.")
+    parser = argparse.ArgumentParser(description="Compute lemma frequency and versioned pilot reduced-frequency statistics.")
     parser.add_argument("--lang", required=True)
     parser.add_argument("--tokens", required=True, help="Token parquet from Stage 02")
-    parser.add_argument("--lemma_sentence", required=True, help="Lemma-sentence parquet from Stage 02")
+    parser.add_argument("--lemma_sentence", required=True, help="Occurrence-level parquet from Stage 02; legacy argument name retained")
     parser.add_argument("--output", required=True, help="Output lemma stats CSV")
     args = parser.parse_args()
 

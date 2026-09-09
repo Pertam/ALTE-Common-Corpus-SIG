@@ -27,7 +27,6 @@ def classify(model: str, row: dict[str, str], inventory: list[dict[str, str]], b
     schema = make_schema(
         "lexical_sense_pass2_review",
         {
-            "row_id": {"type": "string"},
             "validator_decision": {"type": "string", "enum": ["accept", "change", "uncertain"]},
             "sense_id": {"type": "string", "enum": valid_ids},
             "confidence": {"type": "string", "enum": ["high", "medium", "low"]},
@@ -36,7 +35,7 @@ def classify(model: str, row: dict[str, str], inventory: list[dict[str, str]], b
             "interaction_note": {"type": "string"},
             "requires_review": {"type": "boolean"},
         },
-        ["row_id", "validator_decision", "sense_id", "confidence", "rationale", "alternative_sense_id", "interaction_note", "requires_review"],
+        ["validator_decision", "sense_id", "confidence", "rationale", "alternative_sense_id", "interaction_note", "requires_review"],
     )
     prior = "" if blind else f"""
 PASS 1 SENSE PROPOSAL
@@ -68,7 +67,6 @@ APPROVED INVENTORY
 {compact_inventory(inventory)}
 
 SENTENCE
-row_id: {row['row_id']}
 {row['sentence']}
 {prior}
 """
@@ -76,6 +74,9 @@ row_id: {row['row_id']}
     selected = next(x for x in inventory if x["sense_id"] == result["sense_id"])
     if result.get("alternative_sense_id") not in valid_ids:
         result["alternative_sense_id"] = ""
+
+    # Reattach deterministic pipeline identity rather than asking the model to reproduce it.
+    result["row_id"] = row["row_id"]
     result.update({key: row[key] for key in ["sentence", "language", "target_token", "target_lemma", "target_pos"]})
     result["inventory_id"] = selected["inventory_id"]
     result["sense_gloss"] = selected["sense_gloss"]
@@ -83,6 +84,8 @@ row_id: {row['row_id']}
     result["pass1_function_id"] = "" if blind else row["pass1_function_id"]
     result["pass1_function_label"] = "" if blind else row["pass1_function_label"]
     result["review_mode"] = "blind_validation" if blind else "informed_review"
+    if str(selected.get("sense_role", "")).upper() in {"OTHER", "UNCLEAR"}:
+        result["requires_review"] = True
     return result
 
 
@@ -100,7 +103,7 @@ def build_cases(samples: pd.DataFrame, sense_pass1: str | None, function_pass1: 
     require_columns(function, ["row_id", "function_id", "function_label", "confidence", "rationale"], "Function Pass 1")
     sense = sense[["row_id", "sense_id", "confidence", "rationale"]].rename(columns={"sense_id":"pass1_sense_id", "confidence":"pass1_sense_confidence", "rationale":"pass1_sense_rationale"})
     function = function[["row_id", "function_id", "function_label", "confidence", "rationale"]].rename(columns={"function_id":"pass1_function_id", "function_label":"pass1_function_label", "confidence":"pass1_function_confidence", "rationale":"pass1_function_rationale"})
-    return samples.merge(sense, on="row_id", how="inner").merge(function, on="row_id", how="inner")
+    return samples.merge(sense, on="row_id", how="inner", validate="one_to_one").merge(function, on="row_id", how="inner", validate="one_to_one")
 
 
 def main() -> None:

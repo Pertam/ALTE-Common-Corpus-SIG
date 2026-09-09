@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Read-only audit of the ALTE Common Corpus SIG Drive outputs.
+"""Read-only audit of ALTE Common Corpus SIG Drive outputs.
 
-The audit recognises the June 2026 function-only run as legacy data and checks
-whether it can be safely reused by the current sense-aware workflow. It never
-moves, renames, overwrites or deletes project data. Optional report paths create
-new CSV/JSON audit files only.
+The audit distinguishes frozen legacy outputs from the current occurrence-aware
+workflow. It never moves, renames, overwrites or deletes project data. Optional
+report paths create new CSV/JSON audit files only.
 """
 from __future__ import annotations
 
@@ -18,9 +17,14 @@ import pandas as pd
 
 LANGUAGES = ("en", "fr", "es", "de", "cs")
 
-SAMPLE_COLUMNS = {
+LEGACY_SAMPLE_COLUMNS = {
     "row_id", "language_code", "language", "lemma", "pos", "sentence_id",
     "sentence_uid", "sentence", "source_id",
+}
+CURRENT_SAMPLE_COLUMNS = {
+    "row_id", "observation_id", "language_code", "lemma", "pos", "sentence_id",
+    "sentence_uid", "sentence", "source_id", "target_token", "target_token_index",
+    "target_char_start", "target_char_end",
 }
 FUNCTION_PASS1_COLUMNS = {
     "row_id", "sentence", "function_id", "function_label", "confidence",
@@ -31,7 +35,7 @@ LEGACY_PASS2_COLUMNS = {
     "function_id", "function_label", "confidence", "validation_rationale",
     "requires_review",
 }
-CURRENT_PASS2_COLUMNS = {
+CURRENT_FUNCTION_PASS2_COLUMNS = {
     "row_id", "sentence", "pass1_function_id", "pass1_sense_id",
     "validator_decision", "function_id", "function_label", "confidence",
     "rationale", "interaction_note", "requires_review", "review_mode",
@@ -41,14 +45,26 @@ LEGACY_PASS3_COLUMNS = {
     "final_function_id", "final_function_label", "final_confidence",
     "adjudication_rationale", "human_review_recommended",
 }
-SENSE_INVENTORY_COLUMNS = {
-    "inventory_id", "language", "target_lemma", "target_pos", "sense_id",
-    "sense_gloss", "inventory_status",
+CURRENT_FUNCTION_PASS3_COLUMNS = {
+    "row_id", "sentence", "pass1_function_id", "pass2_function_id",
+    "final_function_id", "final_function_label", "final_function_confidence",
+    "adjudication_rationale", "human_review_recommended",
 }
-SENSE_PASS_COLUMNS = {
-    "row_id", "sentence", "language", "target_lemma", "target_pos",
-    "sense_id", "sense_gloss", "confidence", "rationale",
-    "requires_review",
+SENSE_INVENTORY_COLUMNS = {
+    "inventory_id", "inventory_version", "language", "target_lemma", "target_pos",
+    "sense_id", "sense_role", "sense_gloss", "inventory_status",
+}
+SENSE_PASS1_COLUMNS = {
+    "row_id", "sentence", "language", "target_lemma", "target_pos", "inventory_id",
+    "sense_id", "sense_gloss", "confidence", "rationale", "requires_review",
+}
+SENSE_PASS2_COLUMNS = SENSE_PASS1_COLUMNS | {
+    "pass1_sense_id", "validator_decision", "interaction_note", "review_mode",
+}
+SENSE_PASS3_COLUMNS = {
+    "row_id", "sentence", "language", "target_lemma", "target_pos", "inventory_id",
+    "pass1_sense_id", "pass2_sense_id", "final_sense_id", "final_sense_gloss",
+    "final_sense_confidence", "adjudication_rationale", "human_review_recommended",
 }
 
 
@@ -154,11 +170,8 @@ def audit_taxonomy(findings: list[Finding], drive_root: Path, repo_root: Path) -
                 f"Drive-only={len(drive_ids-repo_ids)}; GitHub-only={len(repo_ids-drive_ids)}", drive_taxonomy)
         if "function_guidance" in drive.columns and "function_guidance" not in repo.columns:
             add(findings, "taxonomy", "all", "function guidance", "WARNING",
-                "Drive taxonomy has function_guidance but GitHub taxonomy does not; use Drive taxonomy until synced",
+                "Drive taxonomy has function_guidance but GitHub taxonomy does not; repo helper now also combines decision-rule/exclusion fields when available",
                 drive_taxonomy)
-        elif "function_guidance" in drive.columns and "function_guidance" in repo.columns:
-            add(findings, "taxonomy", "all", "function guidance", "OK",
-                "function_guidance present in both copies", drive_taxonomy)
 
 
 def audit_legacy_language(findings: list[Finding], root: Path, lang: str) -> None:
@@ -167,21 +180,20 @@ def audit_legacy_language(findings: list[Finding], root: Path, lang: str) -> Non
     check_exists(findings, "legacy", lang, "Stage 01 prepared parquet", paths["prepared"])
     check_exists(findings, "legacy", lang, "Stage 02 lemma index", paths["lemma_index"])
     check_exists(findings, "legacy", lang, "Stage 02 token parts", paths["token_parts"],
-                 status="LEGACY_REUSABLE", message="chunked token output preserved; no combined token parquet required for reuse")
+                 status="LEGACY_REUSABLE", message="chunked token output preserved; no combined token parquet required for historical comparison")
     check_csv(findings, "legacy", lang, "Stage 03 lemma statistics", paths["stats"],
               {"language_code", "lemma", "pos", "arf_per_million"}, ok_status="LEGACY_REUSABLE")
     check_csv(findings, "legacy", lang, "Stage 04 full sample", paths["full_sample"],
-              SAMPLE_COLUMNS, ok_status="LEGACY_REUSABLE")
+              LEGACY_SAMPLE_COLUMNS, ok_status="LEGACY_REFERENCE_ONLY")
     check_csv(findings, "legacy", lang, "Stage 04 normalised test50", paths["test50"],
-              SAMPLE_COLUMNS, expected_rows=50, small_profile=True, ok_status="LEGACY_REUSABLE")
+              LEGACY_SAMPLE_COLUMNS, expected_rows=50, small_profile=True, ok_status="LEGACY_REFERENCE_ONLY")
     check_csv(findings, "legacy", lang, "Function Pass 1", paths["function_pass1"],
-              FUNCTION_PASS1_COLUMNS, expected_rows=50, small_profile=True,
-              ok_status="LEGACY_REUSABLE")
+              FUNCTION_PASS1_COLUMNS, expected_rows=50, small_profile=True, ok_status="LEGACY_REUSABLE")
     p2_cols = check_csv(findings, "legacy", lang, "Function Pass 2", paths["function_pass2"],
                         {"row_id", "sentence", "function_id", "function_label", "confidence"},
                         expected_rows=50, small_profile=True, ok_status="LEGACY_REFERENCE_ONLY")
     if p2_cols:
-        if CURRENT_PASS2_COLUMNS.issubset(p2_cols):
+        if CURRENT_FUNCTION_PASS2_COLUMNS.issubset(p2_cols):
             add(findings, "legacy", lang, "Function Pass 2 schema", "CURRENT_COMPATIBLE",
                 "current informed-review schema", paths["function_pass2"])
         elif LEGACY_PASS2_COLUMNS.issubset(p2_cols):
@@ -203,7 +215,7 @@ def audit_legacy_language(findings: list[Finding], root: Path, lang: str) -> Non
         try:
             id_sets = [set(pd.read_csv(path, usecols=["row_id"], dtype=str, encoding="utf-8-sig")["row_id"]) for path in join_files]
             if all(ids == id_sets[0] for ids in id_sets[1:]):
-                add(findings, "legacy", lang, "row_id chain", "OK", "Stage 04–06 row IDs match exactly", paths["test50"])
+                add(findings, "legacy", lang, "row_id chain", "OK", "Stage 04–06 legacy row IDs match exactly", paths["test50"])
             else:
                 sizes = [len(ids) for ids in id_sets]
                 add(findings, "legacy", lang, "row_id chain", "ERROR", f"row-ID sets differ: {sizes}", paths["test50"])
@@ -218,12 +230,14 @@ def audit_v2_language(findings: list[Finding], root: Path, lang: str) -> None:
             "no v2 output folder yet; this is expected before the revised workflow is run", base)
         return
     candidates = {
-        "normalised input": (base / "inputs" / f"{lang}_test50_target_occurrences.csv", SAMPLE_COLUMNS | {"target_lemma", "target_pos"}),
+        "occurrence-aware input": (base / "inputs" / f"{lang}_test50_target_occurrences.csv", CURRENT_SAMPLE_COLUMNS),
         "sense inventory": (base / "sense_inventory" / f"{lang}_sense_inventory_v1.csv", SENSE_INVENTORY_COLUMNS),
-        "sense Pass 1": (base / "sense_pass1" / f"{lang}_sense_pass1_test50.csv", SENSE_PASS_COLUMNS),
-        "sense Pass 2": (base / "sense_pass2" / f"{lang}_sense_pass2_informed_test50.csv", SENSE_PASS_COLUMNS | {"review_mode"}),
-        "function Pass 2": (base / "function_pass2" / f"{lang}_function_pass2_informed_test50.csv", CURRENT_PASS2_COLUMNS),
-        "combined review": (base / "combined_review" / f"{lang}_combined_sense_function_test50.csv", {"row_id", "final_sense_id", "final_function_id", "review_status"}),
+        "sense Pass 1": (base / "sense_pass1" / f"{lang}_sense_pass1_test50.csv", SENSE_PASS1_COLUMNS),
+        "sense Pass 2": (base / "sense_pass2" / f"{lang}_sense_pass2_informed_test50.csv", SENSE_PASS2_COLUMNS),
+        "sense Pass 3": (base / "sense_pass3" / f"{lang}_sense_pass3_test50.csv", SENSE_PASS3_COLUMNS),
+        "function Pass 2": (base / "function_pass2" / f"{lang}_function_pass2_informed_test50.csv", CURRENT_FUNCTION_PASS2_COLUMNS),
+        "function Pass 3": (base / "function_pass3" / f"{lang}_function_pass3_test50.csv", CURRENT_FUNCTION_PASS3_COLUMNS),
+        "combined review": (base / "combined_review" / f"{lang}_combined_sense_function_test50.csv", {"row_id", "observation_id", "final_sense_id", "final_function_id", "review_status", "provenance_tier"}),
     }
     for item, (path, required) in candidates.items():
         if path.exists():

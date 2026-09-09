@@ -21,13 +21,20 @@ except ImportError:  # allows --help and dry-run before optional API deps are in
             return func
         return decorator
 
-GUIDANCE_CANDIDATES = [
+PRIMARY_GUIDANCE_CANDIDATES = [
     "function_guidance",
     "rewritten_guidance",
     "guidance",
     "definition",
     "descriptor_text",
     "function_description",
+]
+SUPPLEMENTARY_GUIDANCE_FIELDS = [
+    ("decision_rule", "Decision rule"),
+    ("do_not_use_when", "Do not use when"),
+    ("common_confusions", "Common confusions"),
+    ("near_miss_examples", "Near misses"),
+    ("positive_examples", "Positive examples"),
 ]
 
 TAXONOMY_REQUIRED = [
@@ -39,6 +46,27 @@ TAXONOMY_REQUIRED = [
 ]
 
 
+def _taxonomy_guidance(row: pd.Series, primary_col: str | None) -> str:
+    """Build guidance from the taxonomy's actual decision fields.
+
+    Older code selected only the first matching column (often ``definition``),
+    silently dropping exclusions and decision rules.  This helper preserves the
+    richer calibration contract when those fields are present.
+    """
+    parts: list[str] = []
+    if primary_col:
+        primary = str(row.get(primary_col, "")).strip()
+        if primary:
+            parts.append(primary)
+    for column, label in SUPPLEMENTARY_GUIDANCE_FIELDS:
+        if column == primary_col:
+            continue
+        value = str(row.get(column, "")).strip()
+        if value:
+            parts.append(f"{label}: {value}")
+    return " | ".join(parts)
+
+
 def read_taxonomy(path: Path) -> tuple[list[dict[str, str]], set[str], dict[str, dict[str, str]]]:
     if not path.exists():
         raise FileNotFoundError(f"Taxonomy file not found: {path}")
@@ -48,10 +76,7 @@ def read_taxonomy(path: Path) -> tuple[list[dict[str, str]], set[str], dict[str,
     if missing:
         raise ValueError(f"Taxonomy file is missing required columns: {missing}")
 
-    guidance_col = next((c for c in GUIDANCE_CANDIDATES if c in df.columns), None)
-    if guidance_col is None:
-        df["function_guidance"] = ""
-        guidance_col = "function_guidance"
+    primary_col = next((c for c in PRIMARY_GUIDANCE_CANDIDATES if c in df.columns), None)
 
     records: list[dict[str, str]] = []
     hierarchy: dict[str, dict[str, str]] = {}
@@ -67,7 +92,7 @@ def read_taxonomy(path: Path) -> tuple[list[dict[str, str]], set[str], dict[str,
             "subcategory_label": str(row["subcategory_label"]).strip(),
             "function_id": function_id,
             "function_label": str(row["function_label"]).strip(),
-            "function_guidance": str(row.get(guidance_col, "")).strip(),
+            "function_guidance": _taxonomy_guidance(row, primary_col),
         }
         records.append(record)
         hierarchy[function_id] = record

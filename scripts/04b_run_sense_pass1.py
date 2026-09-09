@@ -15,12 +15,17 @@ FIELDS = ["row_id", "sentence", "language", "target_token", "target_lemma", "tar
 
 def classify(model: str, row: dict[str, str], inventory: list[dict[str, str]]) -> dict:
     valid_ids = [x["sense_id"] for x in inventory]
-    schema = make_schema("lexical_sense_pass1", {
-        "row_id": {"type": "string"}, "sense_id": {"type": "string", "enum": valid_ids},
-        "confidence": {"type": "string", "enum": ["high", "medium", "low"]},
-        "rationale": {"type": "string"}, "alternative_sense_id": {"type": "string"},
-        "requires_review": {"type": "boolean"}},
-        ["row_id", "sense_id", "confidence", "rationale", "alternative_sense_id", "requires_review"])
+    schema = make_schema(
+        "lexical_sense_pass1",
+        {
+            "sense_id": {"type": "string", "enum": valid_ids},
+            "confidence": {"type": "string", "enum": ["high", "medium", "low"]},
+            "rationale": {"type": "string"},
+            "alternative_sense_id": {"type": "string"},
+            "requires_review": {"type": "boolean"},
+        },
+        ["sense_id", "confidence", "rationale", "alternative_sense_id", "requires_review"],
+    )
     prompt = f"""
 Assign the lexical sense of ONE target lemma occurrence from the approved inventory.
 Classify the target lemma meaning, not the communicative function of the sentence.
@@ -37,16 +42,20 @@ APPROVED INVENTORY
 {compact_inventory(inventory)}
 
 SENTENCE
-row_id: {row['row_id']}
 {row['sentence']}
 """
     result = call_model_json(model, prompt, schema)
     selected = next(x for x in inventory if x["sense_id"] == result["sense_id"])
     if result.get("alternative_sense_id") not in valid_ids:
         result["alternative_sense_id"] = ""
+
+    # IDs and source text are deterministic pipeline data, never model-generated.
+    result["row_id"] = row["row_id"]
     result.update({key: row[key] for key in ["sentence", "language", "target_token", "target_lemma", "target_pos"]})
     result["inventory_id"] = selected["inventory_id"]
     result["sense_gloss"] = selected["sense_gloss"]
+    if str(selected.get("sense_role", "")).upper() in {"OTHER", "UNCLEAR"}:
+        result["requires_review"] = True
     return result
 
 

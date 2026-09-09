@@ -1,5 +1,6 @@
 project_name: ALTE Common Corpus SIG
 drive_root: /content/drive/MyDrive/ALTE-Common-Corpus-SIG
+data_contract_version: v0.2
 
 sampling:
   content_pos: [NOUN, VERB, ADJ, ADV]
@@ -7,12 +8,23 @@ sampling:
   sample_lemmas_per_language: 15
   sentences_per_lemma: 50
   random_seed: 20260603
+  unit: target_occurrence
+  row_id_contract: row_id_equals_observation_id
+  preserve_target_character_span: true
+
+corpus_metrics:
+  frequency_metric_id: pilot_sentence_dispersion_reduced_frequency
+  frequency_metric_version: v1
+  source_dispersion_unit: source_id_values_in_prepared_input
+  warning: Pilot reduced-frequency proxy only; not standard ARF and not CEFR evidence.
 
 sense_tagging:
   inventory_version: v1
   inventory_status_required: approved
   add_other: true
   add_unclear: true
+  stable_unicode_identifiers: true
+  require_new_inventory_version_for_split_merge: true
   pass1_model: gpt-5.4-mini
   pass2_model: gpt-5.4-mini
   pass3_model: gpt-5.5
@@ -22,6 +34,7 @@ sense_tagging:
 
 function_tagging:
   taxonomy: taxonomy/cefr_function_taxonomy_v0_2.csv
+  use_decision_rules_and_exclusions: true
   pass1_model: gpt-5.4-mini
   pass2_model: gpt-5.4-mini
   pass3_model: gpt-5.5
@@ -34,8 +47,16 @@ validation:
   blind_sample_fraction: 0.15
   blind_outputs_separate: true
   compare_with_human_decisions: true
+  preserve_upstream_review_flags: true
+  require_exact_pass1_pass2_row_coverage_for_final_merge: true
+
+human_review:
+  durable_decisions_separate_from_generated_view: true
+  decisions_template: templates/expert_decisions_schema.csv
+  sense_lineage_template: templates/sense_inventory_lineage_schema.csv
 
 provenance:
+  cefr_source: llm_judgment
   llm_provenance_tier: 4
   review_status_default: provisional
   human_inventory_approval_required: true
