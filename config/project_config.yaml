@@ -15,7 +15,8 @@ languages:
     spacy_model: de_core_news_sm
   cs:
     language: Czech
-    spacy_model: cs_core_news_sm
+    spacy_model: null
+    model_note: Select and record the exact tested Czech NLP pipeline explicitly; no unverified spaCy default is assumed.
 content_pos: [NOUN, VERB, ADJ, ADV]
 min_arf_per_million: 50
 lemmas_per_language: 15
