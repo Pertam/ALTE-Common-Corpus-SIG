@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
 """Stage 02: tokenise, POS-tag and lemmatise prepared sentences.
 
-This script uses spaCy models. Install the appropriate model first, for example:
+This stage now preserves *target occurrences*, not only lemma-sentence pairs.
+Each eligible content-word occurrence receives a stable observation_id plus exact
+character offsets.  Repeated occurrences of the same lemma in one sentence are
+therefore distinguishable downstream.
+
+Install an appropriate spaCy model first, for example:
 
 python -m spacy download en_core_web_sm
 python -m spacy download fr_core_news_sm
 python -m spacy download es_core_news_sm
 python -m spacy download de_core_news_sm
 
-For Czech, use a model that is available in your environment and pass it with --model.
+No Czech model is assumed. Pass the exact Czech pipeline available in the pilot
+environment with --model and record that choice in the run manifest.
 """
 
 from __future__ import annotations
@@ -19,13 +25,14 @@ from pathlib import Path
 import pandas as pd
 from tqdm import tqdm
 
+from data_contract_utils import make_observation_id
+
 CONTENT_POS = {"NOUN", "VERB", "ADJ", "ADV"}
 DEFAULT_MODELS = {
     "en": "en_core_web_sm",
     "fr": "fr_core_news_sm",
     "es": "es_core_news_sm",
     "de": "de_core_news_sm",
-    "cs": "cs_core_news_sm",
 }
 
 
@@ -39,9 +46,8 @@ def load_spacy_model(model_name: str):
         return spacy.load(model_name, disable=["ner"])
     except OSError as exc:
         raise SystemExit(
-            f"spaCy model not installed: {model_name}\n"
-            f"Install it first, e.g. python -m spacy download {model_name}\n"
-            "For Czech, pass the exact installed model name with --model."
+            f"spaCy model/pipeline not installed or loadable: {model_name}\n"
+            "Install the exact pipeline required for this language and pass it with --model."
         ) from exc
 
 
@@ -57,6 +63,7 @@ def process(lang: str, model: str, input_path: Path, out_dir: Path, batch_size: 
         raise FileNotFoundError(f"Prepared sentence parquet not found: {input_path}")
 
     nlp = load_spacy_model(model)
+    model_version = str(getattr(nlp, "meta", {}).get("version", ""))
     sentences = pd.read_parquet(input_path)
 
     required = {"language_code", "sentence_id", "sentence_uid", "sentence", "source_id"}
@@ -64,8 +71,12 @@ def process(lang: str, model: str, input_path: Path, out_dir: Path, batch_size: 
     if missing:
         raise ValueError(f"Input sentence file is missing columns: {sorted(missing)}")
 
+    bad_lang = sentences["language_code"].astype(str) != str(lang)
+    if bad_lang.any():
+        raise ValueError(f"Prepared sentence file contains language_code values other than requested --lang={lang}.")
+
     token_rows: list[dict[str, object]] = []
-    lemma_sentence_rows: list[dict[str, object]] = []
+    occurrence_rows: list[dict[str, object]] = []
 
     texts = sentences["sentence"].astype(str).tolist()
     meta = sentences[["language_code", "sentence_id", "sentence_uid", "source_id"]].to_dict("records")
@@ -75,8 +86,6 @@ def process(lang: str, model: str, input_path: Path, out_dir: Path, batch_size: 
         pipe_kwargs["n_process"] = n_process
 
     for doc, m in tqdm(zip(nlp.pipe(texts, **pipe_kwargs), meta), total=len(texts), desc=f"Tokenising {lang}"):
-        seen_lemma_pos_in_sentence: set[tuple[str, str]] = set()
-
         for token_index, tok in enumerate(doc):
             if tok.is_space or tok.is_punct:
                 continue
@@ -85,43 +94,69 @@ def process(lang: str, model: str, input_path: Path, out_dir: Path, batch_size: 
             pos = tok.pos_
             is_alpha = bool(tok.is_alpha)
             is_stop = bool(tok.is_stop)
+            char_start = int(tok.idx)
+            char_end = int(tok.idx + len(tok.text))
 
             token_rows.append(
                 {
                     **m,
                     "token_index": token_index,
+                    "char_start": char_start,
+                    "char_end": char_end,
                     "token": tok.text,
                     "lemma": lemma,
                     "pos": pos,
                     "is_alpha": is_alpha,
                     "is_stop": is_stop,
+                    "tokenizer_model": model,
+                    "tokenizer_model_version": model_version,
                 }
             )
 
             if is_alpha and not is_stop and pos in CONTENT_POS and lemma:
-                key = (lemma, pos)
-                if key not in seen_lemma_pos_in_sentence:
-                    lemma_sentence_rows.append(
-                        {
-                            "language_code": lang,
-                            "lemma": lemma,
-                            "pos": pos,
-                            "sentence_id": m["sentence_id"],
-                            "sentence_uid": m["sentence_uid"],
-                            "source_id": m["source_id"],
-                        }
-                    )
-                    seen_lemma_pos_in_sentence.add(key)
+                observation_id = make_observation_id(
+                    language_code=lang,
+                    sentence_uid=str(m["sentence_uid"]),
+                    target_char_start=char_start,
+                    target_char_end=char_end,
+                    lemma=lemma,
+                    pos=pos,
+                )
+                occurrence_rows.append(
+                    {
+                        "observation_id": observation_id,
+                        "language_code": lang,
+                        "lemma": lemma,
+                        "pos": pos,
+                        "sentence_id": m["sentence_id"],
+                        "sentence_uid": m["sentence_uid"],
+                        "source_id": m["source_id"],
+                        "target_token_index": token_index,
+                        "target_token": tok.text,
+                        "target_char_start": char_start,
+                        "target_char_end": char_end,
+                        "tokenizer_model": model,
+                        "tokenizer_model_version": model_version,
+                    }
+                )
+
+    token_df = pd.DataFrame(token_rows)
+    occurrence_df = pd.DataFrame(occurrence_rows)
+    if not occurrence_df.empty and occurrence_df["observation_id"].duplicated().any():
+        dupes = occurrence_df.loc[occurrence_df["observation_id"].duplicated(), "observation_id"].head(20).tolist()
+        raise ValueError(f"Duplicate observation_id values generated: {dupes}")
 
     out_dir.mkdir(parents=True, exist_ok=True)
     token_path = out_dir / f"{lang}_tokens.parquet"
+    # Filename retained for compatibility; contents are now occurrence-level.
     lemma_sentence_path = out_dir / f"{lang}_lemma_sentence_index.parquet"
 
-    pd.DataFrame(token_rows).to_parquet(token_path, index=False)
-    pd.DataFrame(lemma_sentence_rows).to_parquet(lemma_sentence_path, index=False)
+    token_df.to_parquet(token_path, index=False)
+    occurrence_df.to_parquet(lemma_sentence_path, index=False)
 
     print(f"Tokens saved: {len(token_rows):,} -> {token_path}")
-    print(f"Lemma-sentence rows saved: {len(lemma_sentence_rows):,} -> {lemma_sentence_path}")
+    print(f"Target-occurrence rows saved: {len(occurrence_rows):,} -> {lemma_sentence_path}")
+    print(f"Tokenizer: {model} {model_version}".rstrip())
 
 
 def main() -> None:
@@ -129,14 +164,17 @@ def main() -> None:
     parser.add_argument("--lang", required=True)
     parser.add_argument("--input", required=True, help="Prepared sentence parquet from Stage 01")
     parser.add_argument("--out_dir", default="data/interim")
-    parser.add_argument("--model", help="spaCy model name. If omitted, a default is used for known languages.")
+    parser.add_argument("--model", help="spaCy model/pipeline name. Required when no project default exists (including Czech).")
     parser.add_argument("--batch_size", type=int, default=1000)
     parser.add_argument("--n_process", type=int, default=1)
     args = parser.parse_args()
 
     model = args.model or DEFAULT_MODELS.get(args.lang)
     if not model:
-        raise ValueError(f"No default spaCy model for language {args.lang}. Pass --model explicitly.")
+        raise ValueError(
+            f"No default spaCy model is declared for language {args.lang}. "
+            "Pass --model explicitly and record it in the run manifest."
+        )
 
     process(
         lang=args.lang,
