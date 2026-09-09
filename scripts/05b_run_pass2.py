@@ -22,17 +22,12 @@ FIELDS = [
 ]
 
 
-def schema() -> dict:
+def schema(valid_ids: set[str]) -> dict:
     return make_schema(
         "cefr_function_pass2_review",
         {
-            "row_id": {"type": "string"},
             "validator_decision": {"type": "string", "enum": ["accept", "change", "uncertain"]},
-            "top_level_label": {"type": "string"},
-            "subcategory_id": {"type": "string"},
-            "subcategory_label": {"type": "string"},
-            "function_id": {"type": "string"},
-            "function_label": {"type": "string"},
+            "function_id": {"type": "string", "enum": sorted(valid_ids)},
             "confidence": {"type": "string", "enum": ["high", "medium", "low"]},
             "rationale": {"type": "string"},
             "alternative_function_id": {"type": "string"},
@@ -40,7 +35,7 @@ def schema() -> dict:
             "interaction_note": {"type": "string"},
             "requires_review": {"type": "boolean"},
         },
-        ["row_id", "validator_decision", "top_level_label", "subcategory_id", "subcategory_label", "function_id", "function_label", "confidence", "rationale", "alternative_function_id", "ambiguity_note", "interaction_note", "requires_review"],
+        ["validator_decision", "function_id", "confidence", "rationale", "alternative_function_id", "ambiguity_note", "interaction_note", "requires_review"],
     )
 
 
@@ -70,14 +65,15 @@ CONTROLLED TAXONOMY
 {taxonomy_text}
 
 SENTENCE
-row_id: {row['row_id']}
 {row['sentence']}
 {prior}
 """
-    result = call_model_json(model, prompt, schema())
+    result = call_model_json(model, prompt, schema(set(hierarchy)))
     result = apply_taxonomy_fields(result, "function_id", hierarchy)
     if result.get("alternative_function_id") not in hierarchy:
         result["alternative_function_id"] = ""
+    # Deterministic pipeline identity and taxonomy labels are reattached here.
+    result["row_id"] = row["row_id"]
     result["sentence"] = row["sentence"]
     result["pass1_function_id"] = "" if blind else row["pass1_function_id"]
     result["pass1_sense_id"] = "" if blind else row["pass1_sense_id"]
@@ -100,7 +96,26 @@ def build_cases(samples: pd.DataFrame, function_pass1: str | None, sense_pass1: 
     require_columns(sense, ["row_id", "sense_id", "sense_gloss", "confidence", "rationale"], "Sense Pass 1")
     function = function[["row_id", "function_id", "function_label", "confidence", "rationale"]].rename(columns={"function_id":"pass1_function_id", "function_label":"pass1_function_label", "confidence":"pass1_function_confidence", "rationale":"pass1_function_rationale"})
     sense = sense[["row_id", "sense_id", "sense_gloss", "confidence", "rationale"]].rename(columns={"sense_id":"pass1_sense_id", "sense_gloss":"pass1_sense_gloss", "confidence":"pass1_sense_confidence", "rationale":"pass1_sense_rationale"})
-    return samples.merge(function, on="row_id", how="inner").merge(sense, on="row_id", how="inner")
+    return samples.merge(function, on="row_id", how="inner", validate="one_to_one").merge(sense, on="row_id", how="inner", validate="one_to_one")
+
+
+def normalise_sample_ids(samples: pd.DataFrame) -> pd.DataFrame:
+    result = samples.copy()
+    if "row_id" not in result.columns:
+        if "observation_id" in result.columns:
+            result.insert(0, "row_id", result["observation_id"].astype(str))
+        else:
+            raise ValueError(
+                "Sentence sample requires row_id or observation_id. "
+                "Do not generate positional IDs; rerun occurrence-level sampling."
+            )
+    if "observation_id" in result.columns:
+        mismatch = result["row_id"].astype(str) != result["observation_id"].astype(str)
+        if mismatch.any():
+            raise ValueError("Sentence sample row_id does not match observation_id.")
+    if result["row_id"].duplicated().any():
+        raise ValueError("Sentence sample contains duplicate row_id values.")
+    return result
 
 
 def main() -> None:
@@ -121,8 +136,7 @@ def main() -> None:
     taxonomy_text = compact_taxonomy_text(records)
     samples = pd.read_csv(args.sentences, dtype=str).fillna("")
     require_columns(samples, ["sentence"], "Sentence sample")
-    if "row_id" not in samples.columns:
-        samples.insert(0, "row_id", [f"row_{i+1:06d}" for i in range(len(samples))])
+    samples = normalise_sample_ids(samples)
     data = build_cases(samples, args.pass1, args.sense_pass1, args.blind)
     if args.limit > 0:
         data = data.head(args.limit)
