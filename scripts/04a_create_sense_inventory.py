@@ -1,27 +1,29 @@
 #!/usr/bin/env python3
-"""Stage 04a: propose coarse lexical-sense inventories for sampled lemmas."""
+"""Stage 04a: propose coarse lexical-sense inventories for sampled lemmas.
+
+Identifiers are collision-resistant hashes of NFC-normalised UTF-8 values.  The
+human-readable lemma is never ASCII-folded into an identifier, so multilingual
+distinctions such as Czech být/bít cannot collapse to the same key.
+"""
 from __future__ import annotations
 
 import argparse
 import csv
 import json
-import re
 from pathlib import Path
 
 import pandas as pd
 
+from data_contract_utils import make_inventory_id, make_sense_id
 from llm_function_tagging_utils import call_model_json, make_schema
 from llm_sense_tagging_utils import ensure_target_columns
 
 FIELDS = [
-    "inventory_id", "language", "target_lemma", "target_pos", "sense_id",
-    "sense_gloss", "distinguishing_features", "typical_patterns",
-    "evidence_row_ids", "inventory_status", "expert_comment",
+    "inventory_id", "inventory_version", "language", "target_lemma", "target_pos",
+    "sense_id", "sense_order", "sense_role", "sense_gloss",
+    "distinguishing_features", "typical_patterns", "evidence_row_ids",
+    "inventory_status", "expert_comment",
 ]
-
-
-def safe_id(value: str) -> str:
-    return re.sub(r"[^A-Za-z0-9]+", "_", value.strip()).strip("_").upper() or "ITEM"
 
 
 def schema() -> dict:
@@ -66,6 +68,7 @@ def main() -> None:
     parser.add_argument("--samples", required=True)
     parser.add_argument("--output", required=True)
     parser.add_argument("--model", default="gpt-4.1-mini")
+    parser.add_argument("--inventory_version", default="v1", help="Explicit inventory revision label, e.g. v1, v2")
     parser.add_argument("--max_examples", type=int, default=50)
     parser.add_argument("--limit_lemmas", type=int, default=0)
     parser.add_argument("--dry_run", action="store_true")
@@ -79,7 +82,7 @@ def main() -> None:
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     exists = output.exists() and output.stat().st_size > 0
-    completed = set()
+    completed: set[str] = set()
     if exists:
         previous = pd.read_csv(output, dtype=str).fillna("")
         completed = set(previous.get("inventory_id", []))
@@ -88,42 +91,71 @@ def main() -> None:
         writer = csv.DictWriter(handle, fieldnames=FIELDS)
         if not exists:
             writer.writeheader()
+
         for (language, lemma, pos), group in groups:
-            inventory_id = f"{language.lower()}__{safe_id(lemma)}__{safe_id(pos)}__v1"
+            inventory_id = make_inventory_id(language, lemma, pos, args.inventory_version)
             if inventory_id in completed:
                 continue
+
             examples = group[["row_id", "sentence"]].head(args.max_examples).to_dict("records")
-            senses = ([{"sense_gloss": "Dry-run placeholder sense", "distinguishing_features": "Testing only", "typical_patterns": "", "evidence_row_ids": [x["row_id"] for x in examples[:3]]}]
-                      if args.dry_run else propose(args.model, language, lemma, pos, examples))
-            prefix = f"{safe_id(lemma)}_{safe_id(pos)}"
+            senses = (
+                [{
+                    "sense_gloss": "Dry-run placeholder sense",
+                    "distinguishing_features": "Testing only",
+                    "typical_patterns": "",
+                    "evidence_row_ids": [x["row_id"] for x in examples[:3]],
+                }]
+                if args.dry_run
+                else propose(args.model, language, lemma, pos, examples)
+            )
+
             for number, sense in enumerate(senses, 1):
+                sense_id = make_sense_id(inventory_id, f"ordinary:{number:02d}")
                 writer.writerow({
-                    "inventory_id": inventory_id, "language": language,
-                    "target_lemma": lemma, "target_pos": pos,
-                    "sense_id": f"{prefix}_{number:02d}",
+                    "inventory_id": inventory_id,
+                    "inventory_version": args.inventory_version,
+                    "language": language,
+                    "target_lemma": lemma,
+                    "target_pos": pos,
+                    "sense_id": sense_id,
+                    "sense_order": number,
+                    "sense_role": "ordinary",
                     "sense_gloss": sense["sense_gloss"],
                     "distinguishing_features": sense["distinguishing_features"],
                     "typical_patterns": sense["typical_patterns"],
                     "evidence_row_ids": json.dumps(sense["evidence_row_ids"], ensure_ascii=False),
-                    "inventory_status": "provisional", "expert_comment": "",
-                })
-            for suffix, gloss in [
-                ("OTHER", "A distinct interpretable sense missing from the approved inventory"),
-                ("UNCLEAR", "The sentence context is insufficient to determine the sense"),
-            ]:
-                writer.writerow({
-                    "inventory_id": inventory_id, "language": language,
-                    "target_lemma": lemma, "target_pos": pos,
-                    "sense_id": f"{prefix}_{suffix}", "sense_gloss": gloss,
-                    "distinguishing_features": "", "typical_patterns": "",
-                    "evidence_row_ids": "[]", "inventory_status": "provisional",
+                    "inventory_status": "provisional",
                     "expert_comment": "",
                 })
+
+            for order, role, gloss in [
+                (9001, "OTHER", "A distinct interpretable sense missing from the approved inventory"),
+                (9002, "UNCLEAR", "The sentence context is insufficient to determine the sense"),
+            ]:
+                writer.writerow({
+                    "inventory_id": inventory_id,
+                    "inventory_version": args.inventory_version,
+                    "language": language,
+                    "target_lemma": lemma,
+                    "target_pos": pos,
+                    "sense_id": make_sense_id(inventory_id, role),
+                    "sense_order": order,
+                    "sense_role": role,
+                    "sense_gloss": gloss,
+                    "distinguishing_features": "",
+                    "typical_patterns": "",
+                    "evidence_row_ids": "[]",
+                    "inventory_status": "provisional",
+                    "expert_comment": "",
+                })
+
             handle.flush()
-            print(f"Proposed inventory: {inventory_id}")
+            completed.add(inventory_id)
+            print(f"Proposed inventory: {inventory_id} ({args.inventory_version})")
 
     print(f"Output: {output}")
     print("NEXT: a human expert must revise the inventory and mark retained rows approved.")
+    print("If sense boundaries change by split/merge, create a new inventory_version rather than silently reusing IDs.")
 
 
 if __name__ == "__main__":
